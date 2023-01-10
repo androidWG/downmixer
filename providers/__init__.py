@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from library import Song, DownloadInfo
+from downloader import AudioCodecs
+from library import Song
 from matching import MatchResult
 
 
@@ -15,6 +16,15 @@ class ProviderSearchResult:
     original_song: Song
     result_song: Song
     match_result: MatchResult
+
+
+@dataclass
+class Download:
+    provider: str
+    search_result: ProviderSearchResult
+    filename: Path
+    bitrate: float
+    audio_codec: AudioCodecs
 
 
 class BaseAudioProvider:
@@ -31,27 +41,12 @@ class BaseAudioProvider:
         """
         raise NotImplementedError
 
-    def download_result(self, result: ProviderSearchResult) -> Optional[DownloadInfo]:
+    def download(self, result: ProviderSearchResult) -> Optional[Download]:
         """Downloads a search result.
 
         :param result: The ProviderSearchResult that matches with this provider class.
         :return: DownloadInfo object with the downloaded file information.
-        :rtype: Optional[DownloadInfo]
-        """
-        downloaded = self._download(result.result_song.url)
-        return DownloadInfo(
-            provider=self.provider_name,
-            url=result.result_song.url,
-            song=result.original_song,
-            filename=downloaded.absolute(),
-        )
-
-    def _download(self, url: str) -> Optional[Path]:
-        """Downloads the file from the URL. Can return None if a problem occurs.
-
-        :param url: URL from this provider to download from.
-        :return: Path of the downloaded file.
-        :rtype: Optional[Path]
+        :rtype: Optional[Download]
         """
         raise NotImplementedError
 
