@@ -4,7 +4,7 @@ import spotipy
 
 from library import Song, Playlist
 
-logger = logging.getLogger("peppermint").getChild(__name__)
+logger = logging.getLogger("downmixer").getChild(__name__)
 
 
 def _get_all(func, limit=50, *args, **kwargs):
@@ -23,7 +23,9 @@ def _get_all(func, limit=50, *args, **kwargs):
 
 class SpotipyClient(spotipy.Spotify):
     def current_user_saved_tracks_processed(self, limit=20, offset=0, market=None):
-        results = super().current_user_saved_tracks(limit=limit, offset=offset, market=market)
+        results = super().current_user_saved_tracks(
+            limit=limit, offset=offset, market=market
+        )
         return Song.from_spotify_list(results["items"])
 
     def current_user_playlists_processed(self, limit=50, offset=0):

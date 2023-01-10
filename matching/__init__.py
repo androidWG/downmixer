@@ -22,7 +22,12 @@ class MatchResult:
 
     @property
     def sum(self) -> float:
-        return self.name_match + self.artists_match_avg + self.album_match + self.length_match
+        return (
+            self.name_match
+            + self.artists_match_avg
+            + self.album_match
+            + self.length_match
+        )
 
 
 def match(original_song: Song, result_song: Song) -> MatchResult:
@@ -32,9 +37,7 @@ def match(original_song: Song, result_song: Song) -> MatchResult:
     name_match = _match_simple(song_slug.name, result_slug.name)
     artists_matches = _match_artist_list(song_slug, result_slug)
     if result_slug.album is not None:
-        album_match = _match_simple(
-            song_slug.album.name, result_slug.album.name
-        )
+        album_match = _match_simple(song_slug.album.name, result_slug.album.name)
     else:
         album_match = 0.0
     length_match = _match_length(original_song.duration, result_song.duration)
@@ -44,7 +47,7 @@ def match(original_song: Song, result_song: Song) -> MatchResult:
         name_match=name_match,
         artists_match=artists_matches,
         album_match=album_match,
-        length_match=length_match
+        length_match=length_match,
     )
 
 
@@ -57,7 +60,9 @@ def _match_simple(str1: str, str2: str | None) -> float:
     return match_value
 
 
-def _match_artist_list(slug_song: Song, slug_result: Song) -> List[Tuple[Artist, float]]:
+def _match_artist_list(
+    slug_song: Song, slug_result: Song
+) -> List[Tuple[Artist, float]]:
     artist_matches = []
     for artist in slug_song.artists:
         highest_ratio: Tuple[Optional[Artist], float] = (None, 0.0)
