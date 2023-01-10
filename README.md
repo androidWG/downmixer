@@ -1,3 +1,3 @@
 # Downmixer
 
-Download Spotify songs easily. An alternative to [spotDL](https://github.com/spotDL/spotify-downloader).
+Download Spotify songs easily using YouTube Music. An alternative or replacement to [spotDL](https://github.com/spotDL/spotify-downloader), however, it is **only a Python library, *not* a CLI tool**.
