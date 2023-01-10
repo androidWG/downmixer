@@ -41,10 +41,11 @@ class BaseAudioProvider:
         """
         raise NotImplementedError
 
-    def download(self, result: ProviderSearchResult) -> Optional[Download]:
+    def download(self, result: ProviderSearchResult, path: Path) -> Optional[Download]:
         """Downloads a search result.
 
         :param result: The ProviderSearchResult that matches with this provider class.
+        :param path: The folder in which the file will be downloaded.
         :return: DownloadInfo object with the downloaded file information.
         :rtype: Optional[Download]
         """

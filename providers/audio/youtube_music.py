@@ -1,4 +1,5 @@
 import logging
+import shutil
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -54,6 +55,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         else:
             query = song.title
 
+        # TODO: redo search if ISRC isn't found
         results = self.client.search(query, filter="songs", ignore_spelling=True)
 
         if len(results) == 0:
@@ -69,14 +71,18 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         )
         return ordered_results
 
-    def download(self, result: ProviderSearchResult) -> Optional[Download]:
+    def download(self, result: ProviderSearchResult, path: Path) -> Optional[Download]:
+        # TODO: make file download to temp folder
         url = result.result_song.url
         metadata = self.youtube_dl.extract_info(url, download=True)
         downloaded = metadata["requested_downloads"][0]
+
+        filepath = shutil.move(downloaded["filepath"], path)
+
         return Download(
             provider=self.provider_name,
             search_result=result,
-            filename=Path(downloaded["filepath"]),
+            filename=Path(filepath),
             bitrate=downloaded["abr"],
             audio_codec=AudioCodecs(downloaded["acodec"]),
         )
