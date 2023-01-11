@@ -15,7 +15,7 @@ class ProviderSearchResult:
     provider: str
     original_song: Song
     result_song: Song
-    match_result: MatchResult
+    match: MatchResult
 
 
 @dataclass

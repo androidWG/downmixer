@@ -1,5 +1,4 @@
 import logging
-import shutil
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -37,7 +36,7 @@ def search_result_from_ytmusic(original_song, result_song) -> ProviderSearchResu
         provider="ytmusic",
         original_song=original_song,
         result_song=result_song,
-        match_result=matching.match(original_song, result_song),
+        match=matching.match(original_song, result_song),
     )
 
 
@@ -73,36 +72,38 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
             search_result = search_result_from_ytmusic(song, result_song)
             result_objects.append(search_result)
             logger.debug(
-                f"Found song '{result_song.title}' with URL {result_song.url}, match value {search_result.match_result.sum}"
+                f"Found song '{result_song.title}' with URL {result_song.url}, match value {search_result.match.sum}"
             )
 
         ordered_results = sorted(
-            result_objects, reverse=True, key=lambda x: x.match_result.sum
+            result_objects, reverse=True, key=lambda x: x.match.sum
         )
         logger.info(f"Ordered {len(ordered_results)} results")
         return ordered_results
 
-    def download(self, result: ProviderSearchResult, path: Path) -> Optional[Download]:
+    def download(
+        self, result: ProviderSearchResult, path: str = ""
+    ) -> Optional[Download]:
         logger.info(
             f"Starting download for search result '{result.result_song.title}' with URL {result.result_song.url}"
         )
+
+        # TODO: check before replacing file
         # TODO: make file download to temp folder
+        if path != "":
+            # Define output path of YoutubeDL on the fly
+            self.youtube_dl.params["outtmpl"]["default"] = path + "/%(id)s.%(ext)s"
         url = result.result_song.url
         metadata = self.youtube_dl.extract_info(url, download=True)
         logger.info("Finished downloading")
 
         downloaded = metadata["requested_downloads"][0]
 
-        # TODO: check before replacing file
-        logger.debug(f"Moving file to destination path '{path}'")
-        output_filepath = path.joinpath(Path(downloaded["filepath"]))
-        filepath = shutil.move(downloaded["filepath"], output_filepath)
-
         logger.debug("Creating download object")
         return Download(
             provider=self.provider_name,
             search_result=result,
-            filename=Path(filepath),
+            filename=Path(downloaded["filepath"]),
             bitrate=downloaded["abr"],
             audio_codec=AudioCodecs(downloaded["acodec"]),
         )
