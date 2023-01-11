@@ -1,3 +1,4 @@
+import copy
 import os
 from pathlib import Path
 
@@ -6,7 +7,9 @@ from ffmpeg import FFmpeg
 from providers import Download
 
 
-async def convert(downloaded: Download, delete_original: bool = True) -> Path:
+async def convert_download(
+    downloaded: Download, delete_original: bool = True
+) -> Download:
     # TODO: Check if file already exists
     output = str(downloaded.filename).replace(downloaded.filename.suffix, ".mp3")
     ffmpeg = (
@@ -20,4 +23,6 @@ async def convert(downloaded: Download, delete_original: bool = True) -> Path:
     if delete_original:
         os.remove(downloaded.filename)
 
-    return Path(output)
+    edited_download = copy.copy(downloaded)
+    edited_download.filename = Path(output)
+    return edited_download
