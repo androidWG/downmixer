@@ -1,4 +1,6 @@
 import asyncio
+import shutil
+import tempfile
 from pathlib import Path
 
 from spotipy import SpotifyOAuth
@@ -20,15 +22,23 @@ provider = YouTubeMusicAudioProvider()
 def test_playlist():
     saved_tracks = spotify.current_user_saved_tracks_processed()
 
-    for t in saved_tracks:
-        results = provider.search(t)
-        if results is None or len(results) == 0:
-            continue
+    with tempfile.TemporaryDirectory() as tmp:
+        for t in saved_tracks:
+            results = provider.search(t)
+            if results is None or len(results) == 0:
+                continue
 
-        downloaded = provider.download(results[0], folder)
-        converted = asyncio.run(downloader.convert.convert_download(downloaded))
-        tag_download(converted)
-        print("Done!")
+            print(f"temp folder: {tmp}")
+
+            downloaded = provider.download(results[0], tmp)
+            converted = asyncio.run(downloader.convert.convert_download(downloaded))
+            tag_download(converted)
+
+            shutil.move(
+                converted.filename, "D:\\Files\\Music\\" + converted.filename.name
+            )
+
+            print("Done!")
 
 
 def test_song():
