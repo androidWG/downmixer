@@ -77,7 +77,9 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         metadata = self.youtube_dl.extract_info(url, download=True)
         downloaded = metadata["requested_downloads"][0]
 
-        filepath = shutil.move(downloaded["filepath"], path)
+        # TODO: check before replacing file
+        output_filepath = path.joinpath(Path(downloaded["filepath"]))
+        filepath = shutil.move(downloaded["filepath"], output_filepath)
 
         return Download(
             provider=self.provider_name,
