@@ -29,7 +29,7 @@ class MatchResult:
     def quality(self) -> MatchQuality:
         result = MatchQuality.BAD
         for q in MatchQuality:
-            if self.sum >= q.value:
+            if self.sum <= q.value:
                 result = q
 
         return result
