@@ -52,7 +52,17 @@ class BaseAudioProvider:
         raise NotImplementedError
 
 
-def get_all_providers():
+class BaseLyricsProvider:
+    provider_name = ""
+
+    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+        raise NotImplementedError
+
+    def get_lyrics(self, result: ProviderSearchResult) -> str:
+        raise NotImplementedError
+
+
+def get_all_audio_providers():
     package = sys.modules[__name__]
     return [
         importlib.import_module(__name__ + "." + name)
