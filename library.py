@@ -90,7 +90,7 @@ class Album(BaseLibraryItem):
 class Song(BaseLibraryItem):
     name: str
     artists: List[Artist]
-    duration: float  # in seconds
+    duration: float = 0  # in seconds
     album: Optional[Album] = None
     available_markets: Optional[List[str]] = None
     date: Optional[str] = None
