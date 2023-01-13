@@ -1,7 +1,32 @@
-import requests
+from typing import Optional, List
 
-from library import Song
-from providers import BaseLyricsProvider, ProviderSearchResult
+import requests
+from bs4 import BeautifulSoup, Comment
+
+import matching
+from library import Song, Artist
+from providers import BaseLyricsProvider, ProviderSearchResult, ProviderType
+
+COPYRIGHT_DISCLAIMER = (
+    "Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our "
+    "licensing agreement. Sorry about that."
+)
+
+
+def search_result_from_azlyrics(result, original_song: Song):
+    strings = result[0].find_all("b")
+    name = strings[0].text[1:-1]
+    artist = strings[1].text
+
+    result_song = Song(name=name, artists=[Artist(name=artist)], url=result[0]["href"])
+
+    return ProviderSearchResult(
+        provider="azlyrics",
+        provider_type=ProviderType.AUDIO,
+        original_song=original_song,
+        result_song=result_song,
+        match=matching.match(original_song, result_song),
+    )
 
 
 class AZLyricsProvider(BaseLyricsProvider):
@@ -25,20 +50,30 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         resp = self.session.get("https://www.azlyrics.com/geo.js")
 
-        # extract value from js code
         js_code = resp.text
         start_index = js_code.find('value"') + 9
         end_index = js_code[start_index:].find('");')
 
         self.x_code = js_code[start_index : start_index + end_index]
 
-    def get_lyrics(self, result: ProviderSearchResult):
-        artist_str = ", ".join(artist for artist in artists if artist)
+    def get_lyrics(self, url: str) -> Optional[str]:
+        response = self.session.get(url)
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        params = {
-            "q": f"{artist_str} - {name}",
-            "x": self.x_code,
-        }
+        div_tags = soup.find_all("div", class_=False, id_=False)
+        for d in div_tags:
+            comments = d.find_all(string=lambda x: isinstance(x, Comment))
+            # All AZLyrics lyrics pages have this disclaimer as an HTML comment on the top of the div
+            # containing the lyrics. We can use it to identify which div has lyrics.
+            if len(comments) != 0 and COPYRIGHT_DISCLAIMER in comments[0]:
+                lyrics_div = d
+                lyrics = lyrics_div.get_text().strip()
+                return lyrics
+
+        return None
+
+    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+        params = {"q": "tove lo", "x": self.x_code, "w": "songs"}
 
         response = self.session.get(
             "https://search.azlyrics.com/search.php", params=params
@@ -49,30 +84,15 @@ class AZLyricsProvider(BaseLyricsProvider):
         if len(td_tags) == 0:
             return None
 
-        result = td_tags[0]
+        results: List[ProviderSearchResult] = []
+        result_list = [x.find_all("a", href=True) for x in td_tags]
+        for r in result_list:
+            if len(r) == 0:
+                continue
+            # The first and last td tags in AZLyrics have the page buttons. Skip those when we meet them.
+            elif r[0].has_attr("class") and "btn" in r[0]["class"]:
+                continue
+            else:
+                results.append(search_result_from_azlyrics(r, song))
 
-        a_tags = result.find_all("a", href=True)
-        if len(a_tags) != 0:
-            lyrics_url = a_tags[0]["href"]
-        else:
-            return None
-
-        if lyrics_url.strip() == "":
-            return None
-
-        response = self.session.get(lyrics_url)
-        soup = BeautifulSoup(response.content, "html.parser")
-
-        # Find all divs that don't have a class
-        div_tags = soup.find_all("div", class_=False, id_=False)
-
-        # Find the div with the longest text
-        lyrics_div = sorted(div_tags, key=lambda x: len(x.text))[-1]
-
-        # extract lyrics from div and clean it up
-        lyrics = lyrics_div.get_text().strip()
-
-        return lyrics
-
-    def search(self, song: Song):
-        pass
+        return results
