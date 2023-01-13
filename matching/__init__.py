@@ -37,7 +37,10 @@ class MatchResult:
     @property
     def artists_match_avg(self) -> float:
         match_values = [x[1] for x in self.artists_match]
-        return sum(match_values) / len(self.artists_match)
+        if len(match_values) == 0:
+            return 0.0
+        else:
+            return sum(match_values) / len(self.artists_match)
 
     @property
     def sum(self) -> float:
