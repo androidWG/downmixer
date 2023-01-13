@@ -2,12 +2,18 @@ import importlib
 import pkgutil
 import sys
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
 from file_tools import AudioCodecs
 from library import Song
 from matching import MatchResult
+
+
+class ProviderType(Enum):
+    AUDIO = 0
+    LYRICS = 1
 
 
 @dataclass
@@ -21,6 +27,7 @@ class ProviderSearchResult:
 @dataclass
 class Download:
     provider: str
+    provider_type: ProviderType
     search_result: ProviderSearchResult
     filename: Path
     bitrate: float
