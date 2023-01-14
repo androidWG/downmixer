@@ -2,43 +2,63 @@ import importlib
 import pkgutil
 import sys
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
 from file_tools import AudioCodecs
 from library import Song
-from matching import MatchResult
-
-
-class ProviderType(Enum):
-    AUDIO = 0
-    LYRICS = 1
+from matching import MatchResult, MatchQuality
 
 
 @dataclass
 class ProviderSearchResult:
     provider: str
-    provider_type: ProviderType
-    original_song: Song
-    result_song: Song
     match: MatchResult
+    download_url: str
+    _original_song: Song
+    _result_song: Song
+
+    @property
+    def song(self) -> Song:
+        if self.match.quality == MatchQuality.PERFECT:
+            return self._original_song
+        else:
+            return self._result_song
 
 
 @dataclass
-class Download:
+class LyricsSearchResult:
     provider: str
-    search_result: ProviderSearchResult
+    match: MatchResult
+    name: str
+    artist: str
+    url: str
+
+
+@dataclass
+class Download(ProviderSearchResult):
     filename: Path
     bitrate: float
     audio_codec: AudioCodecs
 
+    @classmethod
+    def from_parent(cls, parent: ProviderSearchResult, filename: Path, bitrate: float, audio_codec: AudioCodecs):
+        return cls(
+            provider=parent.provider,
+            match=parent.match,
+            _result_song=parent._result_song,
+            _original_song=parent._original_song,
+            download_url=parent.download_url,
+            filename=filename,
+            bitrate=bitrate,
+            audio_codec=audio_codec
+        )
+
 
 class BaseAudioProvider:
     """
-    Base class for all other providers. Provides some common functionality.
+    Base class for all audio providers. Defines the interface that any audio provider in Downmixer should use.
     """
-
     provider_name = ""
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
@@ -60,12 +80,25 @@ class BaseAudioProvider:
 
 
 class BaseLyricsProvider:
+    """
+    Base class for all lyrics providers. Defines the interface that any lyrics provider in Downmixer should use.
+    """
     provider_name = ""
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+        """Returns a list of ProviderSearchResult objects ordered by match result, highest to lowest. Can return None if a problem occurs.
+
+        :param song: Song object which will be searched.
+        """
         raise NotImplementedError
 
-    def get_lyrics(self, result: ProviderSearchResult) -> str:
+    def get_lyrics(self, result: ProviderSearchResult) -> Optional[str]:
+        """Downloads a search result.
+
+        :param result: The ProviderSearchResult that matches with this provider class.
+        :return: String object containing the found lyrics, or None if a problem occured.
+        :rtype: Optional[str]
+        """
         raise NotImplementedError
 
 

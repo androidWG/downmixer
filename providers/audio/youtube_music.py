@@ -8,7 +8,7 @@ import ytmusicapi
 import matching
 from file_tools import AudioCodecs
 from library import Artist, Album, Song
-from providers import BaseAudioProvider, ProviderSearchResult, Download, ProviderType
+from providers import BaseAudioProvider, ProviderSearchResult, Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -34,10 +34,10 @@ def song_from_ytmusic(data: Dict[str, Any]) -> Song:
 def search_result_from_ytmusic(original_song, result_song) -> ProviderSearchResult:
     return ProviderSearchResult(
         provider="ytmusic",
-        provider_type=ProviderType.AUDIO,
-        original_song=original_song,
-        result_song=result_song,
+        _original_song=original_song,
+        _result_song=result_song,
         match=matching.match(original_song, result_song),
+        download_url=result_song.url
     )
 
 
@@ -86,7 +86,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         self, result: ProviderSearchResult, path: str = ""
     ) -> Optional[Download]:
         logger.info(
-            f"Starting download for search result '{result.result_song.title}' with URL {result.result_song.url}"
+            f"Starting download for search result '{result.song.title}' with URL {result.download_url}"
         )
 
         # TODO: check before replacing file
@@ -94,16 +94,15 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         if path != "":
             # Define output path of YoutubeDL on the fly
             self.youtube_dl.params["outtmpl"]["default"] = path + "/%(id)s.%(ext)s"
-        url = result.result_song.url
+        url = result.download_url
         metadata = self.youtube_dl.extract_info(url, download=True)
         logger.info("Finished downloading")
 
         downloaded = metadata["requested_downloads"][0]
 
         logger.debug("Creating download object")
-        return Download(
-            provider=self.provider_name,
-            search_result=result,
+        return Download.from_parent(
+            parent=result,
             filename=Path(downloaded["filepath"]),
             bitrate=downloaded["abr"],
             audio_codec=AudioCodecs(downloaded["acodec"]),

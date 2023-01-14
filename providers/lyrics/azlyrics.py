@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup, Comment
 
 import matching
 from library import Song, Artist
-from providers import BaseLyricsProvider, ProviderSearchResult, ProviderType
+from providers import BaseLyricsProvider, LyricsSearchResult
 
 COPYRIGHT_DISCLAIMER = (
     "Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our "
@@ -13,23 +13,24 @@ COPYRIGHT_DISCLAIMER = (
 )
 
 
-def search_result_from_azlyrics(result, original_song: Song):
+def search_result_from_azlyrics(result, original_song: Song) -> LyricsSearchResult:
     strings = result[0].find_all("b")
     name = strings[0].text[1:-1]
     artist = strings[1].text
 
-    result_song = Song(name=name, artists=[Artist(name=artist)], url=result[0]["href"])
-
-    return ProviderSearchResult(
+    result_song = Song(name=name, artists=[Artist(name=artist)])
+    return LyricsSearchResult(
         provider="azlyrics",
-        provider_type=ProviderType.AUDIO,
-        original_song=original_song,
-        result_song=result_song,
         match=matching.match(original_song, result_song),
+        name=name,
+        artist=artist,
+        url=result[0]["href"]
     )
 
 
 class AZLyricsProvider(BaseLyricsProvider):
+    provider_name = "azlyrics"
+
     def __init__(self):
         headers = {
             "Connection": "keep-alive",
@@ -72,7 +73,7 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         return None
 
-    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+    def search(self, song: Song) -> Optional[List[LyricsSearchResult]]:
         params = {"q": song.full_title, "x": self.x_code, "w": "songs"}
 
         response = self.session.get(
@@ -84,7 +85,7 @@ class AZLyricsProvider(BaseLyricsProvider):
         if len(td_tags) == 0:
             return None
 
-        results: List[ProviderSearchResult] = []
+        results: List[LyricsSearchResult] = []
         result_list = [x.find_all("a", href=True) for x in td_tags]
         for r in result_list:
             if len(r) == 0:
@@ -95,4 +96,8 @@ class AZLyricsProvider(BaseLyricsProvider):
             else:
                 results.append(search_result_from_azlyrics(r, song))
 
-        return results
+        ordered_results = sorted(
+            results, reverse=True, key=lambda x: x.match.sum
+        )
+
+        return ordered_results
