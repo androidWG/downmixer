@@ -5,7 +5,7 @@ from pathlib import Path
 
 from ffmpeg import FFmpeg
 
-from providers import Download
+from src.downmixer.providers import Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 

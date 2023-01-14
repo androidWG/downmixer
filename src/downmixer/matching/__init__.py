@@ -4,8 +4,8 @@ from typing import List, Tuple, Optional
 
 from rapidfuzz import fuzz
 
-import matching.utils
-from library import Artist, Song
+import src.downmixer.matching.utils
+from src.downmixer.library import Artist, Song
 
 
 class MatchQuality(Enum):
@@ -108,6 +108,6 @@ def _match_artist_list(
 
 
 def _match_length(len1: float, len2):
-    x = matching.utils.remap(abs(len1 - len2), 0, 120, 0, 1)
-    y = matching.utils.ease(x) * 100
+    x = src.downmixer.matching.utils.remap(abs(len1 - len2), 0, 120, 0, 1)
+    y = src.downmixer.matching.utils.ease(x) * 100
     return max(min(100, y), 0)

@@ -2,7 +2,7 @@ import logging
 
 from spotipy import SpotifyOAuth
 
-from spotify.client import SpotipyClient
+from src.downmixer.spotify.client import SpotipyClient
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
