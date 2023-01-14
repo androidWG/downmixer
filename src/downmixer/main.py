@@ -7,6 +7,9 @@ from spotipy import SpotifyOAuth
 
 import setup_logging
 from library import Song
+from file_tools import utils
+from file_tools import tagging
+from file_tools.convert import convert_download
 from providers import Download, ProviderSearchResult
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
 from providers.lyrics.azlyrics import AZLyricsProvider
@@ -22,17 +25,17 @@ azlyrics = AZLyricsProvider()
 
 def _process_song(result: ProviderSearchResult, temp_folder: str):
     downloaded = ytmusic.download(result, temp_folder)
-    converted: Download = asyncio.run(src.downmixer.file_tools.convert.convert_download(downloaded))
+    converted: Download = asyncio.run(convert_download(downloaded))
 
     lyrics_results = azlyrics.search(converted.song)
     lyrics = azlyrics.get_lyrics(lyrics_results[0].url)
     converted.song.lyrics = lyrics
     converted.song.lyrics = lyrics
 
-    src.downmixer.file_tools.tagging.tag_download(converted)
+    tagging.tag_download(converted)
 
     new_name = (
-            src.downmixer.file_tools.utils.make_sane_filename(converted.song.title)
+            utils.make_sane_filename(converted.song.title)
             + converted.filename.suffix
     )
     shutil.move(converted.filename, "D:\\Files\\Music\\" + new_name)
