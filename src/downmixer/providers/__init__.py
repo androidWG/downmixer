@@ -42,7 +42,13 @@ class Download(ProviderSearchResult):
     audio_codec: AudioCodecs
 
     @classmethod
-    def from_parent(cls, parent: ProviderSearchResult, filename: Path, bitrate: float, audio_codec: AudioCodecs):
+    def from_parent(
+        cls,
+        parent: ProviderSearchResult,
+        filename: Path,
+        bitrate: float,
+        audio_codec: AudioCodecs,
+    ):
         return cls(
             provider=parent.provider,
             match=parent.match,
@@ -51,7 +57,7 @@ class Download(ProviderSearchResult):
             download_url=parent.download_url,
             filename=filename,
             bitrate=bitrate,
-            audio_codec=audio_codec
+            audio_codec=audio_codec,
         )
 
 
@@ -59,6 +65,7 @@ class BaseAudioProvider:
     """
     Base class for all audio providers. Defines the interface that any audio provider in Downmixer should use.
     """
+
     provider_name = ""
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
@@ -83,6 +90,7 @@ class BaseLyricsProvider:
     """
     Base class for all lyrics providers. Defines the interface that any lyrics provider in Downmixer should use.
     """
+
     provider_name = ""
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:

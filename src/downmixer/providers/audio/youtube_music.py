@@ -37,7 +37,7 @@ def search_result_from_ytmusic(original_song, result_song) -> ProviderSearchResu
         _original_song=original_song,
         _result_song=result_song,
         match=matching.match(original_song, result_song),
-        download_url=result_song.url
+        download_url=result_song.url,
     )
 
 
