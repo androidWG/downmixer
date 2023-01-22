@@ -9,7 +9,7 @@ import setup_logging
 from library import Song
 from file_tools import utils
 from file_tools import tagging
-from file_tools.convert import convert_download
+from file_tools.convert import Converter
 from providers import Download, ProviderSearchResult
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
 from providers.lyrics.azlyrics import AZLyricsProvider
@@ -25,7 +25,8 @@ azlyrics = AZLyricsProvider()
 
 def _process_song(result: ProviderSearchResult, temp_folder: str):
     downloaded = ytmusic.download(result, temp_folder)
-    converted: Download = asyncio.run(convert_download(downloaded))
+    converter = Converter(downloaded)
+    converted: Download = asyncio.run(converter.convert())
 
     lyrics_results = azlyrics.search(converted.song)
     lyrics = azlyrics.get_lyrics(lyrics_results[0].url)
@@ -35,8 +36,7 @@ def _process_song(result: ProviderSearchResult, temp_folder: str):
     tagging.tag_download(converted)
 
     new_name = (
-            utils.make_sane_filename(converted.song.title)
-            + converted.filename.suffix
+        utils.make_sane_filename(converted.song.title) + converted.filename.suffix
     )
     shutil.move(converted.filename, "D:\\Files\\Music\\" + new_name)
 
@@ -58,7 +58,9 @@ def test_playlist():
 
 
 def test_song():
-    sp_result = spotify.track("https://open.spotify.com/track/3VlqU2BNVsIl5MQpNOAbG7?si=d2e3964772f44a30")
+    sp_result = spotify.track(
+        "https://open.spotify.com/track/3VlqU2BNVsIl5MQpNOAbG7?si=d2e3964772f44a30"
+    )
     song = Song.from_spotify(sp_result)
 
     with tempfile.TemporaryDirectory() as tmp:

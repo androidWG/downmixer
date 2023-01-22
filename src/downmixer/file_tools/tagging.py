@@ -14,7 +14,9 @@ def tag_download(download: Download):
     logger.info(f"Tagging file {download.filename}")
     _save_easy_tag(download)
 
-    has_cover = download.song.album.images is not None and len(download.song.album.images) != 0
+    has_cover = (
+        download.song.album.images is not None and len(download.song.album.images) != 0
+    )
     if download.song.lyrics or has_cover:
         _save_advanced_tag(download, has_cover)
 
