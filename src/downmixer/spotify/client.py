@@ -22,31 +22,46 @@ def _get_all(func, limit=50, *args, **kwargs):
     return items
 
 
-class SpotipyClient(spotipy.Spotify):
-    def current_user_saved_tracks_processed(
-        self, limit=20, offset=0, market=None
-    ) -> List[Song]:
-        results = super().current_user_saved_tracks(
+class SpotipyClient:
+    def __init__(self, scope: str):
+        self.client = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scope))
+
+    def _saved_tracks(self, limit=20, offset=0, market=None) -> List[Song]:
+        results = self.client.current_user_saved_tracks(
             limit=limit, offset=offset, market=market
         )
         return Song.from_spotify_list(results["items"])
 
-    def current_user_playlists_processed(self, limit=50, offset=0) -> List[Playlist]:
-        results = super().current_user_playlists(limit=limit, offset=offset)
+    def _playlists(self, limit=50, offset=0) -> List[Playlist]:
+        results = self.client.current_user_playlists(limit=limit, offset=offset)
         return Playlist.from_spotify_list(results["items"])
 
-    def playlist_items_processed(self, playlist) -> List[Song]:
-        results = super().playlist_items(limit=100, playlist_id=playlist)
+    def _playlist_songs(self, playlist: Playlist | str) -> List[Song]:
+        if type(playlist) == Playlist:
+            url = playlist.url
+        else:
+            url = playlist
+
+        results = self.client.playlist_items(limit=100, playlist_id=url)
         return Song.from_spotify_list(results["items"])
 
-    def current_user_all_playlists(self):
-        results = _get_all(self.current_user_playlists)
+    def song(self, song: Song | str) -> Song:
+        if type(song) == Playlist:
+            url = song.url
+        else:
+            url = song
+
+        result = self.client.track(url)
+        return Song.from_spotify(result)
+
+    def all_playlists(self):
+        results = _get_all(self._playlists)
         return Playlist.from_spotify_list(results)
 
-    def current_user_all_saved_tracks(self):
-        results = _get_all(self.current_user_saved_tracks, limit=50)
+    def all_saved_tracks(self):
+        results = _get_all(self._saved_tracks, limit=50)
         return Song.from_spotify_list(results)
 
-    def all_playlist_items(self, playlist):
-        results = _get_all(self.playlist_items, limit=100, playlist_id=playlist)
+    def all_playlist_songs(self, playlist):
+        results = _get_all(self._playlist_songs, limit=100, playlist_id=playlist)
         return Song.from_spotify_list(results)

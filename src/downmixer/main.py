@@ -16,7 +16,7 @@ from providers.lyrics.azlyrics import AZLyricsProvider
 from spotify import SpotipyClient
 
 scope = "user-library-read,playlist-read-private"
-spotify = SpotipyClient(auth_manager=SpotifyOAuth(scope=scope))
+spotify = SpotipyClient(scope)
 
 folder = Path(r"D:\Files\Music")
 ytmusic = YouTubeMusicAudioProvider()
@@ -29,9 +29,10 @@ def _process_song(result: ProviderSearchResult, temp_folder: str):
     converted: Download = asyncio.run(converter.convert())
 
     lyrics_results = azlyrics.search(converted.song)
-    lyrics = azlyrics.get_lyrics(lyrics_results[0].url)
-    converted.song.lyrics = lyrics
-    converted.song.lyrics = lyrics
+    if lyrics_results is not None:
+        lyrics = azlyrics.get_lyrics(lyrics_results[0].url)
+        converted.song.lyrics = lyrics
+        converted.song.lyrics = lyrics
 
     tag.tag_download(converted)
 
@@ -42,7 +43,7 @@ def _process_song(result: ProviderSearchResult, temp_folder: str):
 
 
 def test_playlist():
-    saved_tracks = spotify.current_user_saved_tracks_processed()
+    saved_tracks = spotify._saved_tracks()
 
     with tempfile.TemporaryDirectory() as tmp:
         print(f"temp folder: {tmp}")
@@ -58,10 +59,9 @@ def test_playlist():
 
 
 def test_song():
-    sp_result = spotify.track(
+    song = spotify.song(
         "https://open.spotify.com/track/3VlqU2BNVsIl5MQpNOAbG7?si=d2e3964772f44a30"
     )
-    song = Song.from_spotify(sp_result)
 
     with tempfile.TemporaryDirectory() as tmp:
         print(f"temp folder: {tmp}")
@@ -73,8 +73,7 @@ def test_song():
 
 
 def test_lyrics():
-    sp_result = spotify.track("spotify:track:7gjIVNdtHjbkhH9tfgCPM8")
-    song = Song.from_spotify(sp_result)
+    song = spotify.song("spotify:track:7gjIVNdtHjbkhH9tfgCPM8")
 
     results = azlyrics.search(song)
     lyrics = azlyrics.get_lyrics(results[0].url)
