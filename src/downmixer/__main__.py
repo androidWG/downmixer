@@ -1,14 +1,14 @@
+import argparse
 import asyncio
+import os
+import pathlib
 import shutil
 import tempfile
 from pathlib import Path
 
-from spotipy import SpotifyOAuth
-
 import setup_logging
-from library import Song
-from file_tools import utils
 from file_tools import tag
+from file_tools import utils
 from file_tools.convert import Converter
 from providers import Download, ProviderSearchResult
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
@@ -22,8 +22,16 @@ folder = Path(r"D:\Files\Music")
 ytmusic = YouTubeMusicAudioProvider()
 azlyrics = AZLyricsProvider()
 
+parser = argparse.ArgumentParser(
+    prog="downmixer", description="Easily sync tracks from Spotify."
+)
+parser.add_argument("procedure", choices=["download"])
+parser.add_argument("id")
+parser.add_argument("-o", "--output-folder", type=pathlib.Path, default=os.curdir)
+args = parser.parse_args()
 
-async def _process_song(result: ProviderSearchResult, temp_folder: str):
+
+async def _download_and_save_song(result: ProviderSearchResult, temp_folder: str):
     downloaded = await ytmusic.download(result, temp_folder)
     converter = Converter(downloaded)
     converted: Download = await converter.convert()
@@ -42,44 +50,22 @@ async def _process_song(result: ProviderSearchResult, temp_folder: str):
     shutil.move(converted.filename, "D:\\Files\\Music\\" + new_name)
 
 
-async def test_playlist():
-    saved_tracks = spotify._saved_tracks()
+async def _get_song(song_id: str):
+    song = spotify.song(song_id)
 
-    with tempfile.TemporaryDirectory() as tmp:
-        print(f"temp folder: {tmp}")
-
-        for t in saved_tracks:
-            results = await ytmusic.search(t)
-            if results is None or len(results) == 0:
-                continue
-
-            await _process_song(results[0], tmp)
-
-    print("Done!")
+    results = await ytmusic.search(song)
+    return results[0]
 
 
-async def test_song():
-    song = spotify.song(
-        "https://open.spotify.com/track/3VlqU2BNVsIl5MQpNOAbG7?si=d2e3964772f44a30"
-    )
-
-    with tempfile.TemporaryDirectory() as tmp:
-        print(f"temp folder: {tmp}")
-
-        results = await ytmusic.search(song)
-        await _process_song(results[0], tmp)
-
-    print("Done!")
-
-
-async def test_lyrics():
-    song = spotify.song("spotify:track:7gjIVNdtHjbkhH9tfgCPM8")
-
-    results = await azlyrics.search(song)
-    lyrics = await azlyrics.get_lyrics(results[0].url)
-    print(lyrics)
+async def _process_song(temp_folder: str):
+    result_song = await _get_song(args.id)
+    await _download_and_save_song(result_song, temp_folder)
 
 
 if __name__ == "__main__":
     setup_logging.setup_logging(debug=True)
-    asyncio.run(test_song())
+
+    if args.procedure == "download":
+        with tempfile.TemporaryDirectory() as tmp:
+            print(f"temp folder: {tmp}")
+            asyncio.run(_process_song(tmp))
