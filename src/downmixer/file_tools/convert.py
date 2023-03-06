@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-from ffmpeg import FFmpeg
+from ffmpeg.asyncio import FFmpeg
 
 from downmixer.file_tools import Format
 from src.downmixer.providers import Download
