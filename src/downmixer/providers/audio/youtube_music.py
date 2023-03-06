@@ -5,10 +5,10 @@ from typing import Optional, List, Dict, Any
 import yt_dlp
 import ytmusicapi
 
-from src.downmixer import matching
-from src.downmixer.file_tools import AudioCodecs
-from src.downmixer.library import Artist, Album, Song
-from src.downmixer.providers import BaseAudioProvider, ProviderSearchResult, Download
+from downmixer import matching
+from downmixer.file_tools import AudioCodecs
+from downmixer.library import Artist, Album, Song
+from downmixer.providers import BaseAudioProvider, ProviderSearchResult, Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -52,7 +52,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         self.youtube_dl = yt_dlp.YoutubeDL(options)
         logger.debug(f"Initialized YoutubeDL client with options: {options}")
 
-    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+    async def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
         logger.info(f"Initializing search for song '{song.title}' with URI {song.uri}")
         if song.isrc:
             query = song.isrc
@@ -82,7 +82,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         logger.info(f"Ordered {len(ordered_results)} results")
         return ordered_results
 
-    def download(
+    async def download(
         self, result: ProviderSearchResult, path: str = ""
     ) -> Optional[Download]:
         logger.info(

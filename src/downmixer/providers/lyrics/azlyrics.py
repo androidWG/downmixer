@@ -57,7 +57,7 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         self.x_code = js_code[start_index : start_index + end_index]
 
-    def get_lyrics(self, url: str) -> Optional[str]:
+    async def get_lyrics(self, url: str) -> Optional[str]:
         response = self.session.get(url)
         soup = BeautifulSoup(response.content, "html.parser")
 
@@ -73,7 +73,7 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         return None
 
-    def search(self, song: Song) -> Optional[List[LyricsSearchResult]]:
+    async def search(self, song: Song) -> Optional[List[LyricsSearchResult]]:
         params = {"q": song.full_title, "x": self.x_code, "w": "songs"}
 
         response = self.session.get(

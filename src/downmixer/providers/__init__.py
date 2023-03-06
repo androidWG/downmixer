@@ -68,14 +68,16 @@ class BaseAudioProvider:
 
     provider_name = ""
 
-    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+    async def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
         """Returns a list of ProviderSearchResult objects ordered by match result, highest to lowest. Can return None if a problem occurs.
 
         :param song: Song object which will be searched.
         """
         raise NotImplementedError
 
-    def download(self, result: ProviderSearchResult, path: Path) -> Optional[Download]:
+    async def download(
+        self, result: ProviderSearchResult, path: Path
+    ) -> Optional[Download]:
         """Downloads a search result.
 
         :param result: The ProviderSearchResult that matches with this provider class.
@@ -93,14 +95,14 @@ class BaseLyricsProvider:
 
     provider_name = ""
 
-    def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+    async def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
         """Returns a list of ProviderSearchResult objects ordered by match result, highest to lowest. Can return None if a problem occurs.
 
         :param song: Song object which will be searched.
         """
         raise NotImplementedError
 
-    def get_lyrics(self, result: ProviderSearchResult) -> Optional[str]:
+    async def get_lyrics(self, result: ProviderSearchResult) -> Optional[str]:
         """Downloads a search result.
 
         :param result: The ProviderSearchResult that matches with this provider class.
