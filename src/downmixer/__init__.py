@@ -60,10 +60,13 @@ async def _process_song(temp_folder: str):
     await _download_and_save_song(result_song, temp_folder)
 
 
-if __name__ == "__main__":
+def command_line():
     setup_logging.setup_logging(debug=True)
-
     if args.procedure == "download":
         with tempfile.TemporaryDirectory() as tmp:
             print(f"temp folder: {tmp}")
             asyncio.run(_process_song(tmp))
+
+
+if __name__ == "__main__":
+    command_line()

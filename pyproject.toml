@@ -23,3 +23,6 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/androidWG/downmixer"
 "Bug Tracker" = "https://github.com/androidWG/downmixer/issues"
+
+[project.scripts]
+downmixer = "downmixer:command_line"
