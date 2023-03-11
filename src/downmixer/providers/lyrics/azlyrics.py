@@ -3,9 +3,9 @@ from typing import Optional, List
 import requests
 from bs4 import BeautifulSoup, Comment
 
-from src.downmixer import matching
-from src.downmixer.library import Song, Artist
-from src.downmixer.providers import BaseLyricsProvider, LyricsSearchResult
+from downmixer import matching
+from downmixer.library import Song, Artist
+from downmixer.providers import BaseLyricsProvider, LyricsSearchResult
 
 COPYRIGHT_DISCLAIMER = (
     "Usage of azlyrics.com content by any third-party lyrics provider is prohibited by our "

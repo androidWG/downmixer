@@ -3,7 +3,7 @@ from typing import List
 
 import spotipy
 
-from src.downmixer.library import Song, Playlist
+from downmixer.library import Song, Playlist
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
