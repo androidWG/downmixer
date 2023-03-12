@@ -4,6 +4,8 @@ from typing import Optional, Any
 
 import yt_dlp
 import ytmusicapi
+from requests import session
+from yt_dlp import GeoUtils
 
 from downmixer import matching
 from downmixer.file_tools import AudioCodecs
@@ -95,7 +97,17 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.client = ytmusicapi.YTMusic()
+        client_session = session()
+        # if kwargs.get("geo_bypass"):
+        #     client_session.headers.update(
+        #         {"X-Forwarded-For": GeoUtils.random_ipv4("US")}
+        #     )
+
+        # TODO: Some testing relating to this ⬇️
+        # For some reason some songs like 70tjloUDVlGYkapPPTWRxU weren't found via ISRC if the language param was not
+        # specified 🤷🏻‍♀️. Selecting English bought a completely fucked up result too. I copied de (aka German)
+        # from spotDL
+        self.client = ytmusicapi.YTMusic(language="de", requests_session=client_session)
 
         options = {"encoding": "UTF-8", "format": "bestaudio"}
         self.youtube_dl = yt_dlp.YoutubeDL(options)
