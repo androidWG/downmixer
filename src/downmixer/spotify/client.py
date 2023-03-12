@@ -1,9 +1,9 @@
 import logging
-import re
 
 import spotipy
 
 from downmixer.library import Song, Playlist
+from downmixer.spotify.utils import check_valid, ResourceType
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -62,7 +62,7 @@ class SpotifyClient:
         Returns:
             Song object with the metadata retireved from Spotify.
         """
-        if not _check_valid(track_id):
+        if not check_valid(track_id):
             raise ValueError(
                 f"{track_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
                 f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
@@ -111,7 +111,7 @@ class SpotifyClient:
         Returns:
             User's playlists as a list of Playlist objects.
         """
-        if not _check_valid(playlist_id, "playlist"):
+        if not check_valid(playlist_id, [ResourceType.PLAYLIST]):
             raise ValueError(
                 f"{playlist_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
                 f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
@@ -119,11 +119,3 @@ class SpotifyClient:
 
         results = _get_all(self._playlist_songs, limit=100, playlist_id=playlist_id)
         return Song.from_spotify_list(results)
-
-
-def _check_valid(value: str, resource_type: str = "track") -> bool:
-    """Returns True if the string given trhough `value` is a valid Spotify ID, URI or URL, otherwise returns False."""
-    return (
-        re.search(r"spotify.*" + resource_type + r"(?::|\/)(\w{20,24})", value)
-        is not None
-    )
