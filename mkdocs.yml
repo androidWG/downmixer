@@ -47,3 +47,9 @@ repo_name: androidWG/downmixer
 
 markdown_extensions:
   - admonition
+  - abbr
+  - attr_list
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+
