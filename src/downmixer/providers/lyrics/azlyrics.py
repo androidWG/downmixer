@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import Optional
 
 import requests
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup, Comment, ResultSet
 
 from downmixer import matching
 from downmixer.library import Song, Artist
@@ -13,7 +13,19 @@ COPYRIGHT_DISCLAIMER = (
 )
 
 
-def search_result_from_azlyrics(result, original_song: Song) -> LyricsSearchResult:
+def search_result_from_azlyrics(
+    result: ResultSet, original_song: Song
+) -> LyricsSearchResult:
+    """Create a LyricsSearchResult instance from a
+    [Beautiful Soup 4 `ResultSet`](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#find-all) from AZLyrics.
+
+    Args:
+        result (bs4.ResultSet):
+        original_song (Song): Instance of a song from Spotify that will be compared against this search result.
+
+    Returns:
+        LyricsSearchResult from AZLyrics.
+    """
     strings = result[0].find_all("b")
     name = strings[0].text[1:-1]
     artist = strings[1].text
@@ -73,7 +85,7 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         return None
 
-    async def search(self, song: Song) -> Optional[List[LyricsSearchResult]]:
+    async def search(self, song: Song) -> Optional[list[LyricsSearchResult]]:
         params = {"q": song.full_title, "x": self.x_code, "w": "songs"}
 
         response = self.session.get(
@@ -85,7 +97,7 @@ class AZLyricsProvider(BaseLyricsProvider):
         if len(td_tags) == 0:
             return None
 
-        results: List[LyricsSearchResult] = []
+        results: list[LyricsSearchResult] = []
         result_list = [x.find_all("a", href=True) for x in td_tags]
         for r in result_list:
             if len(r) == 0:

@@ -10,10 +10,10 @@ from downmixer.log import setup_logging
 from downmixer.file_tools import tag
 from downmixer.file_tools import utils
 from downmixer.file_tools.convert import Converter
-from downmixer.providers import Download, ProviderSearchResult
+from downmixer.providers import Download, AudioSearchResult
 from downmixer.providers.audio.youtube_music import YouTubeMusicAudioProvider
 from downmixer.providers.lyrics.azlyrics import AZLyricsProvider
-from downmixer.spotify import SpotipyClient
+from downmixer.spotify import SpotifyClient
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -32,7 +32,7 @@ ytmusic = None
 azlyrics = None
 
 
-async def _download_and_save_song(result: ProviderSearchResult, temp_folder: str):
+async def _download_and_save_song(result: AudioSearchResult, temp_folder: str):
     downloaded = await ytmusic.download(result, temp_folder)
     converter = Converter(downloaded)
     converted: Download = await converter.convert()
@@ -68,7 +68,7 @@ def command_line():
 
     scope = "user-library-read,playlist-read-private"
     global spotify, ytmusic, azlyrics
-    spotify = SpotipyClient(scope)
+    spotify = SpotifyClient(scope)
 
     ytmusic = YouTubeMusicAudioProvider()
     azlyrics = AZLyricsProvider()

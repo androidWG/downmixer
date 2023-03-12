@@ -11,6 +11,11 @@ logger = logging.getLogger("downmixer").getChild(__name__)
 
 
 def tag_download(download: Download):
+    """Tag the Download with metadata from its `song` atribute, overriding existing metadata.
+
+    Args:
+        download (Download): Downloaded file to be tagged with song data.
+    """
     logger.info(f"Tagging file {download.filename}")
     _save_easy_tag(download)
 

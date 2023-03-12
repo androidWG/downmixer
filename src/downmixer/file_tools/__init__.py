@@ -1,3 +1,5 @@
+"""Code relating to the manipulation of files - converting and tagging audio files specifically."""
+
 from enum import Enum
 
 
