@@ -95,19 +95,26 @@ def search_result_from_ytmusic(
 class YouTubeMusicAudioProvider(BaseAudioProvider):
     provider_name = "youtube-music"
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, headers_file: Path | None = None, *args: Any, **kwargs: Any):
+        """
+        Args:
+            headers_file (Path | None): A .json headers file from YTMusicAPI. If this argument is None and a file
+                called `yt_headers.json` is found in the working directory, this file will be used.
+                See more [here](https://ytmusicapi.readthedocs.io/en/latest/setup.html#copy-authentication-headers)
+        """
         super().__init__(*args, **kwargs)
-        client_session = session()
-        # if kwargs.get("geo_bypass"):
-        #     client_session.headers.update(
-        #         {"X-Forwarded-For": GeoUtils.random_ipv4("US")}
-        #     )
+
+        default_headers = Path("yt_headers.json")
+        if headers_file is None and default_headers.exists():
+            headers = default_headers
+        else:
+            headers = headers_file
 
         # TODO: Some testing relating to this ⬇️
         # For some reason some songs like 70tjloUDVlGYkapPPTWRxU weren't found via ISRC if the language param was not
-        # specified 🤷🏻‍♀️. Selecting English bought a completely fucked up result too. I copied de (aka German)
+        # specified 🤷🏻‍♀️. Selecting English bought a completely fucked up result too. I copied "de" (aka German)
         # from spotDL
-        self.client = ytmusicapi.YTMusic(language="de", requests_session=client_session)
+        self.client = ytmusicapi.YTMusic(auth=str(headers), language="de")
 
         options = {"encoding": "UTF-8", "format": "bestaudio"}
         self.youtube_dl = yt_dlp.YoutubeDL(options)
