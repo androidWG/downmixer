@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 from downmixer import processing, log
-from downmixer.spotify.utils import ResourceType, check_valid
+from downmixer.spotify.utils import ResourceType, check_valid, get_resource_type
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -38,8 +38,15 @@ def command_line():
 
         with tempfile.TemporaryDirectory() as temp:
             logger.debug(f"temp folder: {temp}")
+            rtype = get_resource_type(args.id)
+
             processor = processing.BasicProcessor(args.output, temp)
-            asyncio.run(processor.process_song(args.id))
+            if rtype == ResourceType.TRACK:
+                logger.debug("Downloading one track")
+                asyncio.run(processor.process_song(args.id))
+            else:
+                logger.debug("Downloading many tracks")
+                processor.process_playlist(args.id)
 
 
 if __name__ == "__main__":

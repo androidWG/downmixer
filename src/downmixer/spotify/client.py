@@ -62,11 +62,11 @@ class SpotifyClient:
         Returns:
             Song object with the metadata retireved from Spotify.
         """
-        if not check_valid(track_id):
-            raise ValueError(
-                f"{track_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
-                f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
-            )
+        if not check_valid(track_id, [ResourceType.TRACK]):
+    raise ValueError(
+        f"{track_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
+        f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
+    )
 
         url = track_id
 
