@@ -8,7 +8,7 @@
     </envs>
     <option name="SDK_HOME" value="C:\Users\samu-\.virtualenvs\downmixer-qkfO1LWH\Scripts\python.exe" />
     <option name="SDK_NAME" value="Pipenv (downmixer)" />
-    <option name="WORKING_DIRECTORY" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />

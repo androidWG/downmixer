@@ -10,13 +10,13 @@
       <env name="SPOTIPY_REDIRECT_URI" value="http://127.0.0.1:9090" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="src/downmixer" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="src/downmixer/__init__.py" />
-    <option name="PARAMETERS" value="download https://open.spotify.com/track/70tjloUDVlGYkapPPTWRxU" />
+    <option name="PARAMETERS" value="download https://open.spotify.com/track/7fgmo2cHGzWLexkRhBeECj?si=4ab3b82498794809" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
