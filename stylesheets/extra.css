@@ -1,0 +1,16 @@
+:root {
+  --md-primary-fg-color:        #5A7520;
+  --md-primary-fg-color--light: #BCF443;
+  --md-primary-fg-color--dark:  #5A7520;
+
+  --md-accent-fg-color:                #799d29FF;
+  --md-accent-fg-color--transparent:   #799d291A;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 79;
+  --md-default-bg-color:             hsla(var(--md-hue), 1%, 10%, 1);
+  --md-default-bg-color--light:      hsla(var(--md-hue), 1%, 10%, 0.54);
+  --md-default-bg-color--lighter:    hsla(var(--md-hue), 1%, 10%, 0.26);
+  --md-default-bg-color--lightest:   hsla(var(--md-hue), 1%, 10%, 0.07);
+}
