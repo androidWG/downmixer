@@ -346,5 +346,5 @@ poetry.toml
 *.mp3
 *.mp4
 
-cookies*.*
+cookies*
 /output/
