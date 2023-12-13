@@ -6,8 +6,9 @@ import yt_dlp
 import ytmusicapi
 
 import matching
+from downloader import AudioCodecs
 from library import Artist, Album, Song
-from providers import BaseAudioProvider, ProviderSearchResult
+from providers import BaseAudioProvider, ProviderSearchResult, Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -68,6 +69,14 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         )
         return ordered_results
 
-    def _download(self, url: str) -> Optional[Path]:
-        downloaded = self.youtube_dl.extract_info(url, download=True)
-        return Path(downloaded["requested_downloads"][0]["filepath"])
+    def download(self, result: ProviderSearchResult) -> Optional[Download]:
+        url = result.result_song.url
+        metadata = self.youtube_dl.extract_info(url, download=True)
+        downloaded = metadata["requested_downloads"][0]
+        return Download(
+            provider=self.provider_name,
+            search_result=result,
+            filename=Path(downloaded["filepath"]),
+            bitrate=downloaded["abr"],
+            audio_codec=AudioCodecs(downloaded["acodec"]),
+        )

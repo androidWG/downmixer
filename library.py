@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 from typing import List, Optional, Any, Dict
 
 from slugify import slugify
@@ -142,14 +141,6 @@ class Song(BaseLibraryItem):
     @property
     def full_title(self) -> str:
         return (", ".join([x.name for x in self.artists])) + " - " + self.name
-
-
-@dataclass
-class DownloadInfo:
-    song: Song
-    url: str
-    provider: str
-    filename: Path
 
 
 @dataclass
