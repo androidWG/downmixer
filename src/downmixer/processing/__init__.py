@@ -1,3 +1,5 @@
+import asyncio
+import logging
 import shutil
 from pathlib import Path
 
@@ -8,6 +10,8 @@ from downmixer.providers.audio.youtube_music import YouTubeMusicAudioProvider
 from downmixer.providers.lyrics.azlyrics import AZLyricsProvider
 from downmixer.spotify import SpotifyClient
 
+logger = logging.getLogger("downmixer").getChild(__name__)
+
 
 async def _convert_download(download: Download) -> Download:
     converter = Converter(download)
@@ -15,7 +19,7 @@ async def _convert_download(download: Download) -> Download:
 
 
 class BasicProcessor:
-    def __init__(self, output_folder: str, temp_folder: str):
+    def __init__(self, output_folder: str, temp_folder: str, threads: int = 6):
         """Basic processing class to search a specific Spotify song and download it, using the default YT Music and
         AZLyrics providers.
 
@@ -23,21 +27,34 @@ class BasicProcessor:
             output_folder (str): Folder path where the final file will be placed.
             temp_folder (str): Folder path where temporary files will be placed and removed from when processing
                 is finished.
+            threads (int): Amount of threads that will simultaniously process songs.
         """
         self.output_folder: Path = Path(output_folder)
         self.temp_folder = temp_folder
 
         scope = "user-library-read,playlist-read-private"
         self.spotify = SpotifyClient(scope)
-
         self.ytmusic = YouTubeMusicAudioProvider()
         self.azlyrics = AZLyricsProvider()
+
+        self.semaphore = asyncio.Semaphore(threads)
+        self.loop = asyncio.new_event_loop()
 
     async def _get_lyrics(self, download: Download):
         lyrics_results = await self.azlyrics.search(download.song)
         if lyrics_results is not None:
             lyrics = await self.azlyrics.get_lyrics(lyrics_results[0].url)
             download.song.lyrics = lyrics
+
+    async def pool_processing(self, song: str):
+        async with self.semaphore:
+            return await self.process_song(song)
+
+    def process_playlist(self, palylist_id: str):
+        songs = self.spotify.all_playlist_songs(palylist_id)
+
+        tasks = [self.pool_processing(s.uri) for s in songs]
+        self.loop.run_until_complete(asyncio.gather(*tasks))
 
     async def process_song(self, song_id: str):
         """Searches the song ISRC on YouTube
@@ -48,6 +65,9 @@ class BasicProcessor:
         song = self.spotify.song(song_id)
 
         result = await self.ytmusic.search(song)
+        if result is None:
+            logger.warning("Song not found", extra={"songinfo": song.__dict__})
+            return
         downloaded = await self.ytmusic.download(result[0], self.temp_folder)
         converted = await _convert_download(downloaded)
 
