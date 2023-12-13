@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "downmixer"
+version = "0.0.1"
+authors = [
+  { name="Sam Rodrigues", email="sam.roliveira@proton.me" },
+]
+description = "Synchronize your Spotify library locally!"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Typing :: Typed"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/androidWG/downmixer"
+"Bug Tracker" = "https://github.com/androidWG/downmixer/issues"
