@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "downmixer"
-version = "0.0.2"
+version = "0.0.1"
 authors = [
-  { name="Sam Rodrigues", email="sam.roliveira@proton.me" },
+    { name = "Sam Rodrigues", email = "sam.roliveira@proton.me" },
 ]
 description = "Synchronize your Spotify library locally!"
 readme = "README.md"
