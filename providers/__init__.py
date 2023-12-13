@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from downloader import AudioCodecs
+from file_tools import AudioCodecs
 from library import Song
 from matching import MatchResult
 

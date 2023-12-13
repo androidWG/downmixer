@@ -6,7 +6,7 @@ import yt_dlp
 import ytmusicapi
 
 import matching
-from downloader import AudioCodecs
+from file_tools import AudioCodecs
 from library import Artist, Album, Song
 from providers import BaseAudioProvider, ProviderSearchResult, Download
 
