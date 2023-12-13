@@ -4,6 +4,7 @@ from pathlib import Path
 from spotipy import SpotifyOAuth
 
 import downloader.convert
+import setup_logging
 from downloader.tagging import tag_download
 from library import Song
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
@@ -42,4 +43,5 @@ def test_song():
 
 
 if __name__ == "__main__":
+    setup_logging.setup_logging(debug=True)
     test_playlist()
