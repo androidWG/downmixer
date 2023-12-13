@@ -4,6 +4,7 @@ from pathlib import Path
 from spotipy import SpotifyOAuth
 
 import downloader.convert
+from downloader.tagging import tag_download
 from library import Song
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
 from spotify import SpotipyClient
@@ -24,8 +25,9 @@ def test_playlist():
             continue
 
         downloaded = provider.download(results[0], folder)
-        converted = asyncio.run(downloader.convert.convert(downloaded))
-        print(converted)
+        converted = asyncio.run(downloader.convert.convert_download(downloaded))
+        tag_download(converted)
+        print("Done!")
 
 
 def test_song():
@@ -34,8 +36,9 @@ def test_song():
 
     results = provider.search(song)
     downloaded = provider.download(results[0], folder)
-    converted = asyncio.run(downloader.convert.convert(downloaded))
-    print(converted)
+    converted = asyncio.run(downloader.convert.convert_download(downloaded))
+    tag_download(converted)
+    print("Done!")
 
 
 if __name__ == "__main__":
