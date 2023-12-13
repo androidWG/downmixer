@@ -34,8 +34,8 @@ class Artist(BaseLibraryItem):
     def from_spotify(cls, data: Dict[str, Any]) -> "Artist":
         return cls(
             name=data["name"],
-            images=data["images"],
-            genres=data["genres"],
+            images=data["images"] if "images" in data.keys() else None,
+            genres=data["genres"] if "genres" in data.keys() else None,
             uri=data["uri"],
             url=data["external_urls"]["spotify"],
         )
@@ -46,7 +46,7 @@ class Artist(BaseLibraryItem):
             images=self.images,
             genres=[slugify(x) for x in self.genres] if self.genres else None,
             uri=self.uri,
-            url=self.url
+            url=self.url,
         )
 
 
@@ -83,7 +83,7 @@ class Album(BaseLibraryItem):
             track_count=self.track_count,
             images=self.images,
             uri=self.uri,
-            url=self.url
+            url=self.url,
         )
 
 
@@ -109,12 +109,16 @@ class Song(BaseLibraryItem):
             artists=Artist.from_spotify_list(data["artists"]),
             album=Album.from_spotify(data["album"]),
             duration=data["duration_ms"] / 1000,
-            date=data["release_date"],
+            date=data["release_date"] if "release_date" in data.keys() else None,
             track_number=data["track_number"],
             isrc=data["external_ids"]["isrc"],
             uri=data["uri"],
             url=data["external_urls"]["spotify"],
         )
+
+    @classmethod
+    def from_spotify_list(cls, data: List[Dict]) -> List:
+        return [cls.from_spotify(x["track"]) for x in data]
 
     def slug(self) -> "Song":
         return Song(
@@ -128,7 +132,7 @@ class Song(BaseLibraryItem):
             isrc=self.isrc,
             uri=self.uri,
             url=self.url,
-            lyrics=slugify(self.lyrics) if self.lyrics else None
+            lyrics=slugify(self.lyrics) if self.lyrics else None,
         )
 
     @property
@@ -158,12 +162,12 @@ class Playlist(BaseLibraryItem):
     url: Optional[str] = None
 
     @classmethod
-    def from_spotify(cls, data: Dict[str | Any]):
+    def from_spotify(cls, data: Dict[str, Any]):
         return Playlist(
             name=data["name"],
             description=data["description"],
             tracks=Song.from_spotify_list(data["tracks"]["items"]),
             images=data["images"],
             uri=data["uri"],
-            url=data["url"]
+            url=data["url"],
         )
