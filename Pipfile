@@ -9,6 +9,7 @@ rapidfuzz = "*"
 ytmusicapi = "*"
 python-slugify = "*"
 spotipy = "*"
+yt-dlp = "*"
 
 [dev-packages]
 black = "*"
