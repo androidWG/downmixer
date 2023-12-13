@@ -1,8 +1,10 @@
+import asyncio
+import functools
 import json
 import logging
 from http.cookiejar import CookieJar
 from pathlib import Path
-from typing import Optional, Any
+from typing import Optional, Any, Callable
 
 import yt_dlp
 import ytmusicapi
@@ -116,6 +118,23 @@ def _get_auth_headers(cookiejar: CookieJar) -> str | None:
     return json.dumps(auth_headers)
 
 
+async def _run_in_loop(func: Callable, kwargs: dict) -> Any:
+    """Runs a syncrhonous function asynchronously using the current event loop.
+
+    Args:
+        func: Function to be called.
+        kwargs: Dictionary of keyword arguments that will be passed to the function.
+
+    Returns:
+        (Any): Whatever the `func` function originally returns.
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None,
+        functools.partial(func, **kwargs),
+    )
+
+
 class YouTubeMusicAudioProvider(BaseAudioProvider):
     provider_name = "youtube-music"
 
@@ -181,7 +200,9 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
             # Define output path of YoutubeDL on the fly
             self.youtube_dl.params["outtmpl"]["default"] = path + "/%(id)s.%(ext)s"
         url = result.download_url
-        metadata = self.youtube_dl.extract_info(url, download=True)
+        metadata = await _run_in_loop(
+            self.youtube_dl.extract_info, {"url": url, "download": True}
+        )
         logger.info("Finished downloading")
 
         downloaded = metadata["requested_downloads"][0]
