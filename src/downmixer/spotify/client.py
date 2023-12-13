@@ -40,12 +40,12 @@ class SpotifyClient:
         results = self.client.current_user_playlists(limit=limit, offset=offset)
         return Playlist.from_spotify_list(results["items"])
 
-    def _playlist_songs(self, playlist: Playlist | str) -> list[Song]:
+    def _playlist_songs(self, playlist_id: Playlist | str) -> list[Song]:
         """Helper function to get a list of Song objects instead of just a dict from the Spotify API."""
-        if type(playlist) == Playlist:
-            url = playlist.url
+        if type(playlist_id) == Playlist:
+            url = playlist_id.url
         else:
-            url = playlist
+            url = playlist_id
 
         results = self.client.playlist_items(limit=100, playlist_id=url)
         return Song.from_spotify_list(results["items"])
@@ -117,5 +117,4 @@ class SpotifyClient:
                 f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
             )
 
-        results = _get_all(self._playlist_songs, limit=100, playlist_id=playlist_id)
-        return Song.from_spotify_list(results)
+        return self._playlist_songs(playlist_id)

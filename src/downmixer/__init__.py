@@ -19,10 +19,20 @@ parser.add_argument(
     help="A valid Spotify ID, URI or URL for a track, album or playlist.",
 )
 parser.add_argument(
-    "-o", "--output-folder", type=Path, default=os.curdir, dest="output"
+    "-o",
+    "--output-folder",
+    type=Path,
+    default=os.curdir,
+    dest="output",
+    help="Path to the folder in which the final processed files will be placed.",
 )
 parser.add_argument(
-    "-c", "--cookie-file", type=str, default=None, dest="cookies", nargs="?"
+    "-c",
+    "--cookie-file",
+    type=str,
+    default=None,
+    dest="cookies",
+    help="Path to a Netscape-formatted text file containing cookies to be used in the requests to YouTube.",
 )
 args = parser.parse_args()
 
@@ -51,7 +61,9 @@ def command_line():
                 asyncio.run(processor.process_song(args.id))
             else:
                 logger.debug("Downloading many tracks")
-                processor.process_playlist(args.id)
+                loop = asyncio.new_event_loop()
+                loop.run_until_complete(processor.process_playlist(args.id))
+                loop.close()
 
 
 if __name__ == "__main__":

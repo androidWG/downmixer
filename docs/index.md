@@ -12,6 +12,7 @@ Downmixer is divided into a few packages that cover the basic process of getting
  - `matching` - matching results from providers to the Spotify song
  - `providers` - audio and lyrics providers
  - `spotify` - wrapper class for the [spotipy](https://github.com/spotipy-dev/spotipy) library
+ - `processing` - sample/convenience class to download one or more files - used by the [command line tool](/cli)
 
 These packages are all independent and are expected to be implemented by you for whatever requirements your application has.
 
