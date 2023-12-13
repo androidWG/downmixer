@@ -23,7 +23,9 @@ def _get_all(func, limit=50, *args, **kwargs):
 
 
 class SpotipyClient(spotipy.Spotify):
-    def current_user_saved_tracks_processed(self, limit=20, offset=0, market=None) -> List[Song]:
+    def current_user_saved_tracks_processed(
+        self, limit=20, offset=0, market=None
+    ) -> List[Song]:
         results = super().current_user_saved_tracks(
             limit=limit, offset=offset, market=market
         )

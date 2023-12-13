@@ -24,7 +24,7 @@ def search_result_from_azlyrics(result, original_song: Song) -> LyricsSearchResu
         match=matching.match(original_song, result_song),
         name=name,
         artist=artist,
-        url=result[0]["href"]
+        url=result[0]["href"],
     )
 
 
@@ -96,8 +96,6 @@ class AZLyricsProvider(BaseLyricsProvider):
             else:
                 results.append(search_result_from_azlyrics(r, song))
 
-        ordered_results = sorted(
-            results, reverse=True, key=lambda x: x.match.sum
-        )
+        ordered_results = sorted(results, reverse=True, key=lambda x: x.match.sum)
 
         return ordered_results
