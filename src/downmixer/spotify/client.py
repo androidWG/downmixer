@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import spotipy
 
@@ -22,17 +23,17 @@ def _get_all(func, limit=50, *args, **kwargs):
 
 
 class SpotipyClient(spotipy.Spotify):
-    def current_user_saved_tracks_processed(self, limit=20, offset=0, market=None):
+    def current_user_saved_tracks_processed(self, limit=20, offset=0, market=None) -> List[Song]:
         results = super().current_user_saved_tracks(
             limit=limit, offset=offset, market=market
         )
         return Song.from_spotify_list(results["items"])
 
-    def current_user_playlists_processed(self, limit=50, offset=0):
+    def current_user_playlists_processed(self, limit=50, offset=0) -> List[Playlist]:
         results = super().current_user_playlists(limit=limit, offset=offset)
         return Playlist.from_spotify_list(results["items"])
 
-    def playlist_items_processed(self, playlist):
+    def playlist_items_processed(self, playlist) -> List[Song]:
         results = super().playlist_items(limit=100, playlist_id=playlist)
         return Song.from_spotify_list(results["items"])
 
