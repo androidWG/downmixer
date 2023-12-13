@@ -47,40 +47,58 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.client = ytmusicapi.YTMusic()
-        self.youtube_dl = yt_dlp.YoutubeDL({"encoding": "UTF-8", "format": "bestaudio"})
+
+        options = {"encoding": "UTF-8", "format": "bestaudio"}
+        self.youtube_dl = yt_dlp.YoutubeDL(options)
+        logger.debug(f"Initialized YoutubeDL client with options: {options}")
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+        logger.info(f"Initializing search for song '{song.title}' with URI {song.uri}")
         if song.isrc:
             query = song.isrc
         else:
             query = song.title
 
         # TODO: redo search if ISRC isn't found
+        logger.debug(f"Searching query '{query}'")
         results = self.client.search(query, filter="songs", ignore_spelling=True)
 
         if len(results) == 0:
+            logger.info("Search returned no results")
             return None
 
         result_objects = []
         for r in results:
             result_song = song_from_ytmusic(r)
-            result_objects.append(search_result_from_ytmusic(song, result_song))
+            search_result = search_result_from_ytmusic(song, result_song)
+            result_objects.append(search_result)
+            logger.debug(
+                f"Found song '{result_song.title}' with URL {result_song.url}, match value {search_result.match_result.sum}"
+            )
 
         ordered_results = sorted(
             result_objects, reverse=True, key=lambda x: x.match_result.sum
         )
+        logger.info(f"Ordered {len(ordered_results)} results")
         return ordered_results
 
     def download(self, result: ProviderSearchResult, path: Path) -> Optional[Download]:
+        logger.info(
+            f"Starting download for search result '{result.result_song.title}' with URL {result.result_song.url}"
+        )
         # TODO: make file download to temp folder
         url = result.result_song.url
         metadata = self.youtube_dl.extract_info(url, download=True)
+        logger.info("Finished downloading")
+
         downloaded = metadata["requested_downloads"][0]
 
         # TODO: check before replacing file
+        logger.debug(f"Moving file to destination path '{path}'")
         output_filepath = path.joinpath(Path(downloaded["filepath"]))
         filepath = shutil.move(downloaded["filepath"], output_filepath)
 
+        logger.debug("Creating download object")
         return Download(
             provider=self.provider_name,
             search_result=result,
