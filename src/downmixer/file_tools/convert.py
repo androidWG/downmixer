@@ -12,7 +12,9 @@ logger = logging.getLogger("downmixer").getChild(__name__)
 
 
 class Converter:
-    def __init__(self, download: Download, format: Format = Format.MP3, bitrate: str = "320k"):
+    def __init__(
+        self, download: Download, format: Format = Format.MP3, bitrate: str = "320k"
+    ):
         self.download = download
         self.format = format
         self.bitrate = bitrate
@@ -22,7 +24,7 @@ class Converter:
 
         # TODO: Check if file already exists
         output = str(self.download.filename).replace(
-            self.download.filename.suffix, self.format.value
+            self.download.filename.suffix, "." + self.format.value
         )
         ffmpeg = (
             FFmpeg()
