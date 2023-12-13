@@ -95,7 +95,7 @@ def _match_artist_list(
 ) -> List[Tuple[Artist, float]]:
     artist_matches = []
     for artist in slug_song.artists:
-        highest_ratio: Tuple[Optional[Artist], float] = (None, 0.0)
+        highest_ratio: Tuple[Optional[Artist], float] = (None, -1.0)
         for result_artist in slug_result.artists:
             ratio = _match_simple(artist.name, result_artist.name)
             if ratio > highest_ratio[1]:
@@ -109,4 +109,5 @@ def _match_artist_list(
 
 def _match_length(len1: float, len2):
     x = matching.utils.remap(abs(len1 - len2), 0, 120, 0, 1)
-    return matching.utils.ease(x) * 100
+    y = matching.utils.ease(x) * 100
+    return max(min(100, y), 0)
