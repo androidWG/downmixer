@@ -12,6 +12,8 @@ plugins:
 
 theme:
   name: material
+  logo: assets/icon_white.svg
+  favicon: images/favicon.png
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -42,3 +44,6 @@ extra_css:
 
 repo_url: https://github.com/androidWG/downmixer
 repo_name: androidWG/downmixer
+
+markdown_extensions:
+  - admonition

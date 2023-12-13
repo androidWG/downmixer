@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/androidWG/downmixer/main/assets/logo_white.svg" style="width: 80vw; max-width: 650px"/>
+    <img src="https://raw.githubusercontent.com/androidWG/downmixer/main/docs/assets/logo_white.svg" style="width: 80vw; max-width: 650px"/>
 </p>
 
 Download Spotify songs easily using YouTube Music. Can be an alternative or replacement to [spotDL](https://github.com/spotDL/spotify-downloader), however, it is **only a Python library, *not* a CLI tool**. A very simple `download` command is available for convenience only.
