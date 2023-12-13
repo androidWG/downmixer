@@ -15,6 +15,13 @@ class Converter:
     def __init__(
         self, download: Download, format: Format = Format.MP3, bitrate: str = "320k"
     ):
+        """Holds information for FFmpeg to convert a download. By default, uses MP3 output format and 320kbps bitrate.
+
+        Args:
+            download (Download): Download object to be converted.
+            format (Format): Output format from the Format enum.
+            bitrate (str): Bitrate in kbps as a string denoting value with a 'k' in the end. Passed directly into FFmpeg.
+        """
         self.download = download
         self.format = format
         self.bitrate = bitrate

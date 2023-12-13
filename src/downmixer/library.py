@@ -1,6 +1,8 @@
+"""Data classes to hold standardized metadata about songs, artists, and albums."""
+
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Any, Dict
+from typing import Optional, Any
 
 from slugify import slugify
 
@@ -12,25 +14,46 @@ class AlbumType(Enum):
 
 
 class BaseLibraryItem:
+    """Base class for library items containing standard methods to easily create class instances from the Spotify
+    API."""
+
     @classmethod
-    def from_spotify(cls, data: Dict[str, Any]):
+    def from_spotify(cls, data: dict[str, Any]):
+        """Create an instance of this class from a Spotify API dict.
+
+        Args:
+            data (dict[str, Any]): Dictionary with data from the Spotify API.
+
+        Returns:
+             An instance of this class.
+        """
         pass
 
     @classmethod
-    def from_spotify_list(cls, data: List[Dict]) -> List:
+    def from_spotify_list(cls, data: list[dict]) -> list:
+        """Creates a list of instances of this class from a list of Spotify API dicts.
+
+        Args:
+            data (list[dict]): List with dictionaries with data from the Spotify API.
+
+        Returns:
+            A list with isntances of this class.
+        """
         return [cls.from_spotify(x) for x in data]
 
 
 @dataclass
 class Artist(BaseLibraryItem):
+    """Holds info about an artist."""
+
     name: str
-    images: Optional[List[str]] = None
-    genres: Optional[List[Dict]] = None
+    images: Optional[list[str]] = None
+    genres: Optional[list[dict]] = None
     uri: Optional[str] = None
     url: Optional[str] = None
 
     @classmethod
-    def from_spotify(cls, data: Dict[str, Any]) -> "Artist":
+    def from_spotify(cls, data: dict[str, Any]) -> "Artist":
         return cls(
             name=data["name"],
             images=data["images"] if "images" in data.keys() else None,
@@ -40,6 +63,7 @@ class Artist(BaseLibraryItem):
         )
 
     def slug(self) -> "Artist":
+        """Returns self with sluggified text attributes."""
         return Artist(
             name=slugify(self.name),
             images=self.images,
@@ -51,17 +75,19 @@ class Artist(BaseLibraryItem):
 
 @dataclass
 class Album(BaseLibraryItem):
+    """Holds info about an album."""
+
     name: str
-    available_markets: Optional[List[str]] = None
-    artists: Optional[List[Artist]] = None
+    available_markets: Optional[list[str]] = None
+    artists: Optional[list[Artist]] = None
     date: Optional[str] = None
     track_count: Optional[int] = None
-    images: Optional[List[Dict]] = None
+    images: Optional[list[dict]] = None
     uri: Optional[str] = None
     url: Optional[str] = None
 
     @classmethod
-    def from_spotify(cls, data: Dict[str, Any]) -> "Album":
+    def from_spotify(cls, data: dict[str, Any]) -> "Album":
         return cls(
             available_markets=data["available_markets"],
             name=data["name"],
@@ -74,6 +100,7 @@ class Album(BaseLibraryItem):
         )
 
     def slug(self) -> "Album":
+        """Returns self with sluggified text attributes."""
         return Album(
             name=slugify(self.name),
             available_markets=self.available_markets,
@@ -88,11 +115,13 @@ class Album(BaseLibraryItem):
 
 @dataclass
 class Song(BaseLibraryItem):
+    """Holds info about a song."""
+
     name: str
-    artists: List[Artist]
+    artists: list[Artist]
     duration: float = 0  # in seconds
     album: Optional[Album] = None
-    available_markets: Optional[List[str]] = None
+    available_markets: Optional[list[str]] = None
     date: Optional[str] = None
     track_number: Optional[int] = None
     isrc: Optional[str] = None
@@ -101,7 +130,7 @@ class Song(BaseLibraryItem):
     url: Optional[str] = None
 
     @classmethod
-    def from_spotify(cls, data: Dict[str, Any]) -> "Song":
+    def from_spotify(cls, data: dict[str, Any]) -> "Song":
         return cls(
             available_markets=data["available_markets"],
             name=data["name"],
@@ -116,10 +145,11 @@ class Song(BaseLibraryItem):
         )
 
     @classmethod
-    def from_spotify_list(cls, data: List[Dict]) -> List:
+    def from_spotify_list(cls, data: list[dict]) -> list:
         return [cls.from_spotify(x["track"]) for x in data]
 
     def slug(self) -> "Song":
+        """Returns self with sluggified text attributes."""
         return Song(
             name=slugify(self.name),
             artists=[x.slug() for x in self.artists],
@@ -136,14 +166,17 @@ class Song(BaseLibraryItem):
 
     @property
     def title(self) -> str:
+        """str: Title of the song, including artist, in the format '[primary artist] - [song name]'."""
         return self.artists[0].name + " - " + self.name
 
     @property
     def full_title(self) -> str:
+        """str: Full title of the song, including all artists, in the format [artist 1, artist 2, ...] - [song name]."""
         return (", ".join(x.name for x in self.artists)) + " - " + self.name
 
     @property
     def all_artists(self) -> str:
+        """str: All artists' names, separated by a comma."""
         return ", ".join(x.name for x in self.artists)
 
 
@@ -151,13 +184,13 @@ class Song(BaseLibraryItem):
 class Playlist(BaseLibraryItem):
     name: str
     description: Optional[str] = None
-    tracks: Optional[List[Song]] = None
-    images: Optional[List[Dict]] = None
+    tracks: Optional[list[Song]] = None
+    images: Optional[list[dict]] = None
     uri: Optional[str] = None
     url: Optional[str] = None
 
     @classmethod
-    def from_spotify(cls, data: Dict[str, Any]):
+    def from_spotify(cls, data: dict[str, Any]):
         return Playlist(
             name=data["name"],
             description=data["description"],

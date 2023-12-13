@@ -29,10 +29,11 @@ theme:
         name: Switch to light mode
   font:
     text: Inter
-    code: Jet Brains Mono
+    code: JetBrains Mono
   features:
     - search.suggest
     - search.highlight
+    - toc.integrate
     - navigation.instant
     - navigation.tracking
     - navigation.sections

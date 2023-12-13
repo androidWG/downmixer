@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 
 import yt_dlp
 import ytmusicapi
@@ -8,20 +8,56 @@ import ytmusicapi
 from downmixer import matching
 from downmixer.file_tools import AudioCodecs
 from downmixer.library import Artist, Album, Song
-from downmixer.providers import BaseAudioProvider, ProviderSearchResult, Download
+from downmixer.providers import BaseAudioProvider, AudioSearchResult, Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
 
-def artist_from_ytmusic(data: Dict[str, Any]) -> Artist:
+def artist_from_ytmusic(data: dict[str, Any]) -> Artist:
+    """Create an Artist instance from a dict provided by the YouTube Music API search function. Sadly the only
+    metadata of use form the search results is the title of the artist. More info on the result's schema [here](
+    https://ytmusicapi.readthedocs.io/en/stable/reference.html#search).
+
+    Args:
+        data (dict):
+            Dictionary provided by the YouTube Music API from the
+            [`ytmusicapi`](https://github.com/sigma67/ytmusicapi) package.
+
+    Returns:
+        Artist instance populated from the dict.
+    """
     return Artist(name=data["name"])
 
 
-def album_from_ytmusic(data: Dict[str, Any]) -> Album:
+def album_from_ytmusic(data: dict[str, Any]) -> Album:
+    """Create an Album instance from a dict provided by the YouTube Music API search function. Sadly the only
+    metadata of use form the search results is the title of the album. More info on the result's schema [here](
+    https://ytmusicapi.readthedocs.io/en/stable/reference.html#search).
+
+    Args:
+        data (dict):
+            Dictionary provided by the YouTube Music API from the
+            [`ytmusicapi`](https://github.com/sigma67/ytmusicapi) package.
+
+    Returns:
+        Album instance populated from the dict.
+    """
     return Album(name=data["name"])
 
 
-def song_from_ytmusic(data: Dict[str, Any]) -> Song:
+def song_from_ytmusic(data: dict[str, Any]) -> Song:
+    """Create a Song instance from a dict provided by the YouTube Music API search function, including the Artist and
+    Album objects. More info on the result's schema
+    [here](https://ytmusicapi.readthedocs.io/en/stable/reference.html#search).
+
+    Args:
+        data (dict):
+            Dictionary provided by the YouTube Music API from the
+            [`ytmusicapi`](https://github.com/sigma67/ytmusicapi) package.
+
+    Returns:
+        Song instance populated from the dict..
+    """
     return Song(
         name=data["title"],
         artists=[artist_from_ytmusic(x) for x in data["artists"]],
@@ -31,8 +67,21 @@ def song_from_ytmusic(data: Dict[str, Any]) -> Song:
     )
 
 
-def search_result_from_ytmusic(original_song, result_song) -> ProviderSearchResult:
-    return ProviderSearchResult(
+def search_result_from_ytmusic(
+    original_song: Song, result_song: Song
+) -> AudioSearchResult:
+    """Create an AudioSearchResult instance from a dict provided by the YouTube Music API search function. Sadly the only
+    metadata of use form the search results is the title of the artist. More info on the result's schema [here](
+    https://ytmusicapi.readthedocs.io/en/stable/reference.html#search).
+
+    Args:
+        original_song (Song): Instance of a song from Spotify that will be compared against this search result.
+        result_song (Song): Song extracted from the search result info.
+
+    Returns:
+        AudioSearchResult from YT Music.
+    """
+    return AudioSearchResult(
         provider="ytmusic",
         _original_song=original_song,
         _result_song=result_song,
@@ -52,7 +101,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         self.youtube_dl = yt_dlp.YoutubeDL(options)
         logger.debug(f"Initialized YoutubeDL client with options: {options}")
 
-    async def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
+    async def search(self, song: Song) -> Optional[list[AudioSearchResult]]:
         logger.info(f"Initializing search for song '{song.title}' with URI {song.uri}")
         if song.isrc:
             query = song.isrc
@@ -83,7 +132,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         return ordered_results
 
     async def download(
-        self, result: ProviderSearchResult, path: str = ""
+        self, result: AudioSearchResult, path: str = ""
     ) -> Optional[Download]:
         logger.info(
             f"Starting download for search result '{result.song.title}' with URL {result.download_url}"
