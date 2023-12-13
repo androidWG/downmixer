@@ -8,7 +8,9 @@ from spotipy import SpotifyOAuth
 import file_tools.convert
 import setup_logging
 from file_tools.tagging import tag_download
+from file_tools.utils import make_sane_filename
 from library import Song
+from providers import Download
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
 from spotify import SpotipyClient
 
@@ -31,12 +33,16 @@ def test_playlist():
             print(f"temp folder: {tmp}")
 
             downloaded = provider.download(results[0], tmp)
-            converted = asyncio.run(file_tools.convert.convert_download(downloaded))
+            converted: Download = asyncio.run(
+                file_tools.convert.convert_download(downloaded)
+            )
             tag_download(converted)
 
-            shutil.move(
-                converted.filename, "D:\\Files\\Music\\" + converted.filename.name
+            new_name = (
+                make_sane_filename(converted.search_result.result_song.title)
+                + converted.filename.suffix
             )
+            shutil.move(converted.filename, "D:\\Files\\Music\\" + new_name)
 
             print("Done!")
 
