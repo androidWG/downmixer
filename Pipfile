@@ -12,6 +12,8 @@ spotipy = "*"
 yt-dlp = "*"
 python-ffmpeg = "*"
 mutagen = "*"
+requests = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 black = "*"
