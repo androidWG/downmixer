@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "downmixer"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Sam Rodrigues", email="sam.roliveira@proton.me" },
 ]
@@ -22,6 +22,7 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/androidWG/downmixer"
+"Documentation" = "https://androidwg.github.io/downmixer"
 "Bug Tracker" = "https://github.com/androidWG/downmixer/issues"
 
 [project.scripts]
