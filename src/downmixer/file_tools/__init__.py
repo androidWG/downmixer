@@ -10,6 +10,9 @@ class Format(Enum):
     OPUS = "opus"
 
 
+# TODO: Deal with the fact there's like 5000 different combinations of this
+# https://developer.mozilla.org/en-US/docs/Web/Media/Formats/codecs_parameter#mpeg-4_audio
 class AudioCodecs(Enum):
     MP4A_40_5 = "mp4a.40.5"
+    MP4A_40_2 = "mp4a.40.2"
     OPUS = "opus"
