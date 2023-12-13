@@ -8,7 +8,7 @@ from spotipy import SpotifyOAuth
 import setup_logging
 from library import Song
 from file_tools import utils
-from file_tools import tagging
+from file_tools import tag
 from file_tools.convert import Converter
 from providers import Download, ProviderSearchResult
 from providers.audio.youtube_music import YouTubeMusicAudioProvider
@@ -33,7 +33,7 @@ def _process_song(result: ProviderSearchResult, temp_folder: str):
     converted.song.lyrics = lyrics
     converted.song.lyrics = lyrics
 
-    tagging.tag_download(converted)
+    tag.tag_download(converted)
 
     new_name = (
         utils.make_sane_filename(converted.song.title) + converted.filename.suffix
