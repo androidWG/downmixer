@@ -98,10 +98,12 @@ def _get_auth_headers(cookiejar: CookieJar) -> str | None:
 
     If no YouTube cookies are found, returns None.
     """
-    cookies = ""
-    for c in cookiejar:
-        if c.domain.__contains__("youtube"):
-            cookies += ";" + c.name + "=" + c.value.replace("\"", "")
+    cookie_strings = [
+        x.name + "=" + x.value.replace('"', "")
+        for x in cookiejar
+        if "youtube" in x.domain
+    ]
+    cookies = ";".join(cookie_strings)
 
     if len(cookies) == 0:
         return None
@@ -109,7 +111,7 @@ def _get_auth_headers(cookiejar: CookieJar) -> str | None:
     auth_headers = {
         "origin": "https://music.youtube.com",
         "x-origin": "https://music.youtube.com",
-        "cookie": cookies
+        "cookie": cookies,
     }
     return json.dumps(auth_headers)
 
@@ -117,19 +119,14 @@ def _get_auth_headers(cookiejar: CookieJar) -> str | None:
 class YouTubeMusicAudioProvider(BaseAudioProvider):
     provider_name = "youtube-music"
 
-    def __init__(self, browser_specification: tuple = ("chrome",), *args: Any, **kwargs: Any):
+    def __init__(self, cookies: str = None, *args: Any, **kwargs: Any):
         """
         Args:
-            browser_specification (tuple[str]): Passed directly to [`yt-dlp`](https://github.com/yt-dlp/yt-dlp).
-                From their docstrings: A tuple containing the name of the browser, the profile name/path from where
-                cookies are loaded, the name of the keyring, and the container name, e.g. ('chrome', ) or
-                ('vivaldi', 'default', 'BASICTEXT') or ('firefox', 'default', None, 'Meta').
-
-                By default, all containers of the most recently accessed profile are used.
+            cookies (str): Path to a Netscape formatted text file containing cookies to use in requests.
         """
         super().__init__(*args, **kwargs)
 
-        options = {"encoding": "UTF-8", "format": "bestaudio", "cookiesfrombrowser": browser_specification}
+        options = {"encoding": "UTF-8", "format": "bestaudio", "cookiefile": cookies}
         self.youtube_dl = yt_dlp.YoutubeDL(options)
         logger.debug(f"Initialized YoutubeDL client with options: {options}")
 

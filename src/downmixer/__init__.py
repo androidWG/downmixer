@@ -21,6 +21,9 @@ parser.add_argument(
 parser.add_argument(
     "-o", "--output-folder", type=Path, default=os.curdir, dest="output"
 )
+parser.add_argument(
+    "-c", "--cookie-file", type=str, default=None, dest="cookies", nargs="?"
+)
 args = parser.parse_args()
 
 
@@ -40,7 +43,9 @@ def command_line():
             logger.debug(f"temp folder: {temp}")
             rtype = get_resource_type(args.id)
 
-            processor = processing.BasicProcessor(args.output, temp)
+            processor = processing.BasicProcessor(
+                args.output, temp, cookies=os.path.abspath(args.cookies)
+            )
             if rtype == ResourceType.TRACK:
                 logger.debug("Downloading one track")
                 asyncio.run(processor.process_song(args.id))

@@ -19,7 +19,13 @@ async def _convert_download(download: Download) -> Download:
 
 
 class BasicProcessor:
-    def __init__(self, output_folder: str, temp_folder: str, threads: int = 6):
+    def __init__(
+        self,
+        output_folder: str,
+        temp_folder: str,
+        threads: int = 6,
+        cookies: str = None,
+    ):
         """Basic processing class to search a specific Spotify song and download it, using the default YT Music and
         AZLyrics providers.
 
@@ -34,7 +40,7 @@ class BasicProcessor:
 
         scope = "user-library-read,playlist-read-private"
         self.spotify = SpotifyClient(scope)
-        self.ytmusic = YouTubeMusicAudioProvider()
+        self.ytmusic = YouTubeMusicAudioProvider(cookies)
         self.azlyrics = AZLyricsProvider()
 
         self.semaphore = asyncio.Semaphore(threads)
