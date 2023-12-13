@@ -345,3 +345,5 @@ poetry.toml
 *.opus
 *.mp3
 *.mp4
+
+yt_headers.json
