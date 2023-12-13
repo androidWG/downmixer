@@ -19,6 +19,7 @@ class ProviderType(Enum):
 @dataclass
 class ProviderSearchResult:
     provider: str
+    provider_type: ProviderType
     original_song: Song
     result_song: Song
     match: MatchResult
@@ -27,7 +28,6 @@ class ProviderSearchResult:
 @dataclass
 class Download:
     provider: str
-    provider_type: ProviderType
     search_result: ProviderSearchResult
     filename: Path
     bitrate: float

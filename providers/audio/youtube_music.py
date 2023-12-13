@@ -34,6 +34,7 @@ def song_from_ytmusic(data: Dict[str, Any]) -> Song:
 def search_result_from_ytmusic(original_song, result_song) -> ProviderSearchResult:
     return ProviderSearchResult(
         provider="ytmusic",
+        provider_type=ProviderType.AUDIO,
         original_song=original_song,
         result_song=result_song,
         match=matching.match(original_song, result_song),
@@ -102,7 +103,6 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         logger.debug("Creating download object")
         return Download(
             provider=self.provider_name,
-            provider_type=ProviderType.AUDIO,
             search_result=result,
             filename=Path(downloaded["filepath"]),
             bitrate=downloaded["abr"],
