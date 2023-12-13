@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Optional
 from urllib.request import urlopen
 
 import mutagen
@@ -11,6 +12,14 @@ logger = logging.getLogger("downmixer").getChild(__name__)
 
 def tag_download(download: Download):
     logger.info(f"Tagging file {download.filename}")
+    _save_easy_tag(download)
+
+    has_cover = download.song.album.images is not None and len(download.song.album.images) != 0
+    if download.song.lyrics or has_cover:
+        _save_advanced_tag(download, has_cover)
+
+
+def _save_easy_tag(download: Download):
     easy_id3 = mutagen.File(download.filename, easy=True)
 
     logger.debug("Deleting old tag information")
@@ -29,39 +38,36 @@ def tag_download(download: Download):
         _return_if_valid(download.song.track_number),
         _return_if_valid(download.song.album.track_count),
     ]
+    # TODO: include all tags possible here, grab them from youtube/spotify if needed
 
     logger.info("Saving EasyID3 data to file")
     easy_id3.save()
 
-    has_cover = download.song.album.images is not None and len(download.song.album.images) != 0
-    if download.song.lyrics or has_cover:
-        id3 = ID3(download.filename)
 
-        if download.song.lyrics:
-            logger.debug("Adding lyrics")
-            id3["USLT::'eng'"] = USLT(
-                encoding=3, lang="eng", desc="Unsynced Lyrics", text=download.song.lyrics
+def _save_advanced_tag(download: Download, has_cover):
+    id3 = ID3(download.filename)
+    if download.song.lyrics:
+        logger.debug("Adding lyrics")
+        id3["USLT::'eng'"] = USLT(
+            encoding=3, lang="eng", desc="Unsynced Lyrics", text=download.song.lyrics
+        )
+    if has_cover:
+        url = download.song.album.images[0]["url"]
+        logger.debug(f"Downloading cover image from URL {url}")
+
+        with urlopen(url) as raw_image:
+            id3["APIC"] = APIC(
+                encoding=3,
+                mime="image/jpeg",
+                type=3,
+                desc="Cover",
+                data=raw_image.read(),
             )
-
-        if has_cover:
-            url = download.song.album.images[0]["url"]
-            logger.debug(f"Downloading cover image from URL {url}")
-
-            with urlopen(url) as raw_image:
-                id3["APIC"] = APIC(
-                    encoding=3,
-                    mime="image/jpeg",
-                    type=3,
-                    desc="Cover",
-                    data=raw_image.read(),
-                )
-
-        logger.info("Saving ID3 data to file")
-        id3.save()
-    # TODO: include all tags possible here, grab them from youtube/spotify if needed
+    logger.info("Saving ID3 data to file")
+    id3.save()
 
 
-def _return_if_valid(value):
+def _return_if_valid(value: Any | None) -> Optional[Any]:
     if value is None:
         return ""
     else:
