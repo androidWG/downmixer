@@ -11,6 +11,7 @@ python-slugify = "*"
 spotipy = "*"
 yt-dlp = "*"
 python-ffmpeg = "*"
+mutagen = "*"
 
 [dev-packages]
 black = "*"
