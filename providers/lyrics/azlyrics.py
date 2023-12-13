@@ -73,7 +73,7 @@ class AZLyricsProvider(BaseLyricsProvider):
         return None
 
     def search(self, song: Song) -> Optional[List[ProviderSearchResult]]:
-        params = {"q": "tove lo", "x": self.x_code, "w": "songs"}
+        params = {"q": song.full_title, "x": self.x_code, "w": "songs"}
 
         response = self.session.get(
             "https://search.azlyrics.com/search.php", params=params
