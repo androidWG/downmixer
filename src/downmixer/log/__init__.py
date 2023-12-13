@@ -85,7 +85,7 @@ def setup_logging(debug: bool = False):
                 "format": colored_format,
                 "style": "%",
                 "validate": False,
-                "class": "setup_logging.ColoredFormatter",
+                "class": "downmixer.log.ColoredFormatter",
             },
         },
         "handlers": {

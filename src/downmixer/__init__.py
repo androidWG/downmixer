@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import logging
 import os
 import shutil
 import tempfile
@@ -14,11 +15,7 @@ from downmixer.providers.audio.youtube_music import YouTubeMusicAudioProvider
 from downmixer.providers.lyrics.azlyrics import AZLyricsProvider
 from downmixer.spotify import SpotipyClient
 
-scope = "user-library-read,playlist-read-private"
-spotify = SpotipyClient(scope)
-
-ytmusic = YouTubeMusicAudioProvider()
-azlyrics = AZLyricsProvider()
+logger = logging.getLogger("downmixer").getChild(__name__)
 
 parser = argparse.ArgumentParser(
     prog="downmixer", description="Easily sync tracks from Spotify."
@@ -27,6 +24,12 @@ parser.add_argument("procedure", choices=["download"])
 parser.add_argument("id")
 parser.add_argument("-o", "--output-folder", type=Path, default=os.curdir)
 args = parser.parse_args()
+
+
+spotify = None
+
+ytmusic = None
+azlyrics = None
 
 
 async def _download_and_save_song(result: ProviderSearchResult, temp_folder: str):
@@ -61,8 +64,17 @@ async def _process_song(temp_folder: str):
 
 
 def command_line():
-    setup_logging.setup_logging(debug=True)
+    setup_logging(debug=True)
+
+    scope = "user-library-read,playlist-read-private"
+    global spotify, ytmusic, azlyrics
+    spotify = SpotipyClient(scope)
+
+    ytmusic = YouTubeMusicAudioProvider()
+    azlyrics = AZLyricsProvider()
+
     if args.procedure == "download":
+        logger.debug("Running download command")
         with tempfile.TemporaryDirectory() as tmp:
             print(f"temp folder: {tmp}")
             asyncio.run(_process_song(tmp))
