@@ -1,11 +1,11 @@
+import json
 import logging
+from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Optional, Any
 
 import yt_dlp
 import ytmusicapi
-from requests import session
-from yt_dlp import GeoUtils
 
 from downmixer import matching
 from downmixer.file_tools import AudioCodecs
@@ -92,33 +92,54 @@ def search_result_from_ytmusic(
     )
 
 
+def _get_auth_headers(cookiejar: CookieJar) -> str | None:
+    """Makes the headers that `ytmusicapi` expects to authorize YT Music requests from cookies extracted from the
+    browser_specification. Returns JSON as a string.
+
+    If no YouTube cookies are found, returns None.
+    """
+    cookies = ""
+    for c in cookiejar:
+        if c.domain.__contains__("youtube"):
+            cookies += ";" + c.name + "=" + c.value.replace("\"", "")
+
+    if len(cookies) == 0:
+        return None
+
+    auth_headers = {
+        "origin": "https://music.youtube.com",
+        "x-origin": "https://music.youtube.com",
+        "cookie": cookies
+    }
+    return json.dumps(auth_headers)
+
+
 class YouTubeMusicAudioProvider(BaseAudioProvider):
     provider_name = "youtube-music"
 
-    def __init__(self, headers_file: Path | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, browser_specification: tuple = ("chrome",), *args: Any, **kwargs: Any):
         """
         Args:
-            headers_file (Path | None): A .json headers file from YTMusicAPI. If this argument is None and a file
-                called `yt_headers.json` is found in the working directory, this file will be used.
-                See more [here](https://ytmusicapi.readthedocs.io/en/latest/setup.html#copy-authentication-headers)
+            browser_specification (tuple[str]): Passed directly to [`yt-dlp`](https://github.com/yt-dlp/yt-dlp).
+                From their docstrings: A tuple containing the name of the browser, the profile name/path from where
+                cookies are loaded, the name of the keyring, and the container name, e.g. ('chrome', ) or
+                ('vivaldi', 'default', 'BASICTEXT') or ('firefox', 'default', None, 'Meta').
+
+                By default, all containers of the most recently accessed profile are used.
         """
         super().__init__(*args, **kwargs)
 
-        default_headers = Path("yt_headers.json")
-        if headers_file is None and default_headers.exists():
-            headers = default_headers
-        else:
-            headers = headers_file
+        options = {"encoding": "UTF-8", "format": "bestaudio", "cookiesfrombrowser": browser_specification}
+        self.youtube_dl = yt_dlp.YoutubeDL(options)
+        logger.debug(f"Initialized YoutubeDL client with options: {options}")
+
+        auth_headers = _get_auth_headers(self.youtube_dl.cookiejar)
 
         # TODO: Some testing relating to this ⬇️
         # For some reason some songs like 70tjloUDVlGYkapPPTWRxU weren't found via ISRC if the language param was not
         # specified 🤷🏻‍♀️. Selecting English bought a completely fucked up result too. I copied "de" (aka German)
         # from spotDL
-        self.client = ytmusicapi.YTMusic(auth=str(headers), language="de")
-
-        options = {"encoding": "UTF-8", "format": "bestaudio"}
-        self.youtube_dl = yt_dlp.YoutubeDL(options)
-        logger.debug(f"Initialized YoutubeDL client with options: {options}")
+        self.client = ytmusicapi.YTMusic(auth=auth_headers, language="de")
 
     async def search(self, song: Song) -> Optional[list[AudioSearchResult]]:
         logger.info(f"Initializing search for song '{song.title}' with URI {song.uri}")
