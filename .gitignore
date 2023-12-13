@@ -346,4 +346,4 @@ poetry.toml
 *.mp3
 *.mp4
 
-yt_headers.json
+cookies*.*
