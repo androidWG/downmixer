@@ -1,16 +1,16 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "downmixer"
 version = "0.0.1"
 authors = [
-    { name = "Sam Rodrigues", email = "sam.roliveira@proton.me" },
+    { name = "Anna Rodrigues", email = "anna.roliveira@proton.me" },
 ]
 description = "Synchronize your Spotify library locally!"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
