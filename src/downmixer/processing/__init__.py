@@ -23,7 +23,7 @@ class BasicProcessor:
         self,
         output_folder: str,
         temp_folder: str,
-        threads: int = 6,
+        threads: int = 12,
         cookies: str = None,
     ):
         """Basic processing class to search a specific Spotify song and download it, using the default YT Music and
@@ -35,7 +35,7 @@ class BasicProcessor:
                 is finished.
             threads (int): Amount of threads that will simultaniously process songs.
         """
-        self.output_folder: Path = Path(output_folder)
+        self.output_folder: Path = Path(output_folder).absolute()
         self.temp_folder = temp_folder
 
         scope = "user-library-read,playlist-read-private"
@@ -44,7 +44,6 @@ class BasicProcessor:
         self.azlyrics = AZLyricsProvider()
 
         self.semaphore = asyncio.Semaphore(threads)
-        self.loop = asyncio.new_event_loop()
 
     async def _get_lyrics(self, download: Download):
         lyrics_results = await self.azlyrics.search(download.song)
@@ -53,14 +52,16 @@ class BasicProcessor:
             download.song.lyrics = lyrics
 
     async def pool_processing(self, song: str):
+        logger.debug(f"Starting pool processing of {song}")
         async with self.semaphore:
-            return await self.process_song(song)
+            logger.debug(f"Processing song '{song}'")
+            await self.process_song(song)
 
-    def process_playlist(self, palylist_id: str):
+    async def process_playlist(self, palylist_id: str):
         songs = self.spotify.all_playlist_songs(palylist_id)
 
         tasks = [self.pool_processing(s.uri) for s in songs]
-        self.loop.run_until_complete(asyncio.gather(*tasks))
+        await asyncio.gather(*tasks)
 
     async def process_song(self, song_id: str):
         """Searches the song ISRC on YouTube
@@ -82,5 +83,10 @@ class BasicProcessor:
 
         new_name = (
             utils.make_sane_filename(converted.song.title) + converted.filename.suffix
+        )
+
+        self.output_folder.mkdir(parents=True, exist_ok=True)
+        logger.debug(
+            f"Moving file from '{converted.filename}' to '{self.output_folder}'"
         )
         shutil.move(converted.filename, self.output_folder.joinpath(new_name))
