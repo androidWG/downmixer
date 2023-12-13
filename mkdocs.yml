@@ -3,6 +3,7 @@
 site_name: Downmixer Documentation
 
 plugins:
+- search
 - mkdocstrings:
     default_handler: python
     handlers:
@@ -11,3 +12,33 @@ plugins:
 
 theme:
   name: material
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: Jet Brains Mono
+  features:
+    - search.suggest
+    - search.highlight
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+
+extra_css:
+  - stylesheets/extra.css
+
+repo_url: https://github.com/androidWG/downmixer
+repo_name: androidWG/downmixer
