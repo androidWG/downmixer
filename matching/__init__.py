@@ -1,10 +1,20 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Tuple, Optional
 
 from rapidfuzz import fuzz
 
 import matching.utils
 from library import Artist, Song
+
+
+class MatchQuality(Enum):
+    """Thresholds to consider when getting the quality of a match. Values are based on the sum of all matches."""
+
+    PERFECT = 390  # Both songs are the same. Some lenience is given in case an artist isn't included in the artist list for example.
+    GOOD = 280  # Likely a different version of the same song, like a live version.
+    MEDIOCRE = 150  # Probably a cover from another artist or something else from the same artist.
+    BAD = 0  # Not the same song.
 
 
 @dataclass
@@ -14,6 +24,15 @@ class MatchResult:
     artists_match: List[Tuple[Artist, float]]
     album_match: float
     length_match: float
+
+    @property
+    def quality(self) -> MatchQuality:
+        result = MatchQuality.BAD
+        for q in MatchQuality:
+            if self.sum >= q.value:
+                result = q
+
+        return result
 
     @property
     def artists_match_avg(self) -> float:
@@ -28,6 +47,14 @@ class MatchResult:
             + self.album_match
             + self.length_match
         )
+
+    def all_above_threshold(self, threshold: float) -> bool:
+        name_test = self.name_match >= threshold
+        artists_test = self.artists_match_avg >= threshold
+        album_test = self.album_match >= threshold
+        length_test = self.length_match >= threshold
+
+        return name_test and artists_test and album_test and length_test
 
 
 def match(original_song: Song, result_song: Song) -> MatchResult:
