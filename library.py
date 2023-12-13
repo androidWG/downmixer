@@ -140,7 +140,11 @@ class Song(BaseLibraryItem):
 
     @property
     def full_title(self) -> str:
-        return (", ".join([x.name for x in self.artists])) + " - " + self.name
+        return (", ".join(x.name for x in self.artists)) + " - " + self.name
+
+    @property
+    def all_artists(self) -> str:
+        return ", ".join(x.name for x in self.artists)
 
 
 @dataclass
