@@ -8,7 +8,7 @@ import ytmusicapi
 import matching
 from file_tools import AudioCodecs
 from library import Artist, Album, Song
-from providers import BaseAudioProvider, ProviderSearchResult, Download
+from providers import BaseAudioProvider, ProviderSearchResult, Download, ProviderType
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -102,6 +102,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         logger.debug("Creating download object")
         return Download(
             provider=self.provider_name,
+            provider_type=ProviderType.AUDIO,
             search_result=result,
             filename=Path(downloaded["filepath"]),
             bitrate=downloaded["abr"],
