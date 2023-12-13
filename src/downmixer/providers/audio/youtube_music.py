@@ -5,10 +5,10 @@ from typing import Optional, List, Dict, Any
 import yt_dlp
 import ytmusicapi
 
-import matching
-from file_tools import AudioCodecs
-from library import Artist, Album, Song
-from providers import BaseAudioProvider, ProviderSearchResult, Download
+from src.downmixer import matching
+from src.downmixer.file_tools import AudioCodecs
+from src.downmixer.library import Artist, Album, Song
+from src.downmixer.providers import BaseAudioProvider, ProviderSearchResult, Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 

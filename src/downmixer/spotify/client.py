@@ -2,7 +2,7 @@ import logging
 
 import spotipy
 
-from library import Song, Playlist
+from src.downmixer.library import Song, Playlist
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 

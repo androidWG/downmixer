@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from file_tools import AudioCodecs
-from library import Song
-from matching import MatchResult, MatchQuality
+from src.downmixer.file_tools import AudioCodecs
+from src.downmixer.library import Song
+from src.downmixer.matching import MatchResult, MatchQuality
 
 
 @dataclass

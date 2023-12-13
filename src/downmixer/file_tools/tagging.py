@@ -4,7 +4,7 @@ from urllib.request import urlopen
 import mutagen
 from mutagen.id3 import APIC, USLT, ID3
 
-from providers import Download
+from src.downmixer.providers import Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 

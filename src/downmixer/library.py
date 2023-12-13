@@ -96,9 +96,9 @@ class Song(BaseLibraryItem):
     date: Optional[str] = None
     track_number: Optional[int] = None
     isrc: Optional[str] = None
+    lyrics: Optional[str] = None
     uri: Optional[str] = None
     url: Optional[str] = None
-    lyrics: Optional[str] = None
 
     @classmethod
     def from_spotify(cls, data: Dict[str, Any]) -> "Song":
