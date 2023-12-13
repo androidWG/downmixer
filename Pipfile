@@ -10,6 +10,7 @@ ytmusicapi = "*"
 python-slugify = "*"
 spotipy = "*"
 yt-dlp = "*"
+python-ffmpeg = "*"
 
 [dev-packages]
 black = "*"
