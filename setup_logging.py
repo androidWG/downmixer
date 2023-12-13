@@ -1,3 +1,4 @@
+import copy
 import datetime
 import logging.config
 
@@ -6,6 +7,44 @@ COLOR_SEQ = "\033[1;%dm"
 BOLD_SEQ = "\033[1m"
 ITALIC_SEQ = "\033[3m"
 UNDERLINE_SEQ = "\033[4m"
+
+BLACK, RED, GREEN, YELLOW, ORANGE, PURPLE, CYAN, GREY = range(8)
+
+COLORS = {
+    "WARNING": YELLOW,
+    "INFO": GREY,
+    "DEBUG": ORANGE,
+    "CRITICAL": YELLOW,
+    "ERROR": RED,
+}
+
+
+class MillisecondFormatter(logging.Formatter):
+    """A formatter for standard library 'logging' that supports '%f' wildcard in format strings."""
+
+    converter = datetime.datetime.fromtimestamp
+
+    def formatTime(self, record, datefmt=None):
+        converter = self.converter(record.created)
+        if datefmt:
+            s = converter.strftime(datefmt)[:-3]
+        else:
+            t = converter.strftime("%Y-%m-%d %H:%M:%S")
+            s = "%s,%03d" % (t, record.msecs)
+        return s
+
+
+class ColoredFormatter(logging.Formatter):
+    def format(self, record):
+        new_record = copy.copy(record)
+        levelname = new_record.levelname
+
+        if levelname in COLORS:
+            levelname_color = (
+                COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
+            )
+            new_record.levelname = levelname_color
+        return logging.Formatter.format(self, new_record)
 
 
 def formatter_message(message, use_color=True):
@@ -27,9 +66,6 @@ def formatter_message(message, use_color=True):
 
 
 def setup_logging(debug: bool = False):
-    prefix = "debug_" if debug else ""
-    filename = f'{prefix}downmixer_{datetime.datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")}.log'
-
     base_format = (
         "[$BOLD%(levelname)-8s$RESET] ($BOLD%(filename)s:%(lineno)d$RESET) %(message)s"
     )
@@ -49,13 +85,7 @@ def setup_logging(debug: bool = False):
                 "format": colored_format,
                 "style": "%",
                 "validate": False,
-                "class": "util.log_setup.ColoredFormatter",
-            },
-            "millisecondFormatter": {
-                "format": file_format,
-                "datefmt": "%H:%M:%S.%f",
-                "style": "%",
-                "class": "util.log_setup.MillisecondFormatter",
+                "class": "setup_logging.ColoredFormatter",
             },
         },
         "handlers": {
@@ -68,7 +98,7 @@ def setup_logging(debug: bool = False):
         },
         "loggers": {
             "downmixer": {
-                "handlers": ["console", "file"],
+                "handlers": ["console"],
                 "level": "DEBUG" if debug else "INFO",
                 "propagate": True,
             }
