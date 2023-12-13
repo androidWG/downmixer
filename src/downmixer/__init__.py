@@ -5,14 +5,14 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import setup_logging
-from file_tools import tag
-from file_tools import utils
-from file_tools.convert import Converter
-from providers import Download, ProviderSearchResult
-from providers.audio.youtube_music import YouTubeMusicAudioProvider
-from providers.lyrics.azlyrics import AZLyricsProvider
-from spotify import SpotipyClient
+from downmixer.log import setup_logging
+from downmixer.file_tools import tag
+from downmixer.file_tools import utils
+from downmixer.file_tools.convert import Converter
+from downmixer.providers import Download, ProviderSearchResult
+from downmixer.providers.audio.youtube_music import YouTubeMusicAudioProvider
+from downmixer.providers.lyrics.azlyrics import AZLyricsProvider
+from downmixer.spotify import SpotipyClient
 
 scope = "user-library-read,playlist-read-private"
 spotify = SpotipyClient(scope)

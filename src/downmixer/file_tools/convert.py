@@ -6,7 +6,7 @@ from pathlib import Path
 from ffmpeg.asyncio import FFmpeg
 
 from downmixer.file_tools import Format
-from src.downmixer.providers import Download
+from downmixer.providers import Download
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
