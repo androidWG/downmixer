@@ -23,14 +23,14 @@ ytmusic = YouTubeMusicAudioProvider()
 azlyrics = AZLyricsProvider()
 
 
-def _process_song(result: ProviderSearchResult, temp_folder: str):
-    downloaded = ytmusic.download(result, temp_folder)
+async def _process_song(result: ProviderSearchResult, temp_folder: str):
+    downloaded = await ytmusic.download(result, temp_folder)
     converter = Converter(downloaded)
-    converted: Download = asyncio.run(converter.convert())
+    converted: Download = await converter.convert()
 
-    lyrics_results = azlyrics.search(converted.song)
+    lyrics_results = await azlyrics.search(converted.song)
     if lyrics_results is not None:
-        lyrics = azlyrics.get_lyrics(lyrics_results[0].url)
+        lyrics = await azlyrics.get_lyrics(lyrics_results[0].url)
         converted.song.lyrics = lyrics
         converted.song.lyrics = lyrics
 
@@ -42,23 +42,23 @@ def _process_song(result: ProviderSearchResult, temp_folder: str):
     shutil.move(converted.filename, "D:\\Files\\Music\\" + new_name)
 
 
-def test_playlist():
+async def test_playlist():
     saved_tracks = spotify._saved_tracks()
 
     with tempfile.TemporaryDirectory() as tmp:
         print(f"temp folder: {tmp}")
 
         for t in saved_tracks:
-            results = ytmusic.search(t)
+            results = await ytmusic.search(t)
             if results is None or len(results) == 0:
                 continue
 
-            _process_song(results[0], tmp)
+            await _process_song(results[0], tmp)
 
     print("Done!")
 
 
-def test_song():
+async def test_song():
     song = spotify.song(
         "https://open.spotify.com/track/3VlqU2BNVsIl5MQpNOAbG7?si=d2e3964772f44a30"
     )
@@ -66,20 +66,20 @@ def test_song():
     with tempfile.TemporaryDirectory() as tmp:
         print(f"temp folder: {tmp}")
 
-        results = ytmusic.search(song)
-        _process_song(results[0], tmp)
+        results = await ytmusic.search(song)
+        await _process_song(results[0], tmp)
 
     print("Done!")
 
 
-def test_lyrics():
+async def test_lyrics():
     song = spotify.song("spotify:track:7gjIVNdtHjbkhH9tfgCPM8")
 
-    results = azlyrics.search(song)
-    lyrics = azlyrics.get_lyrics(results[0].url)
+    results = await azlyrics.search(song)
+    lyrics = await azlyrics.get_lyrics(results[0].url)
     print(lyrics)
 
 
 if __name__ == "__main__":
     setup_logging.setup_logging(debug=True)
-    test_song()
+    asyncio.run(test_song())
