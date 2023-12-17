@@ -60,7 +60,7 @@ def song_from_ytmusic(data: dict[str, Any]) -> Song:
             [`ytmusicapi`](https://github.com/sigma67/ytmusicapi) package.
 
     Returns:
-        Song instance populated from the dict..
+        Song instance populated from the dict.
     """
     return Song(
         name=data["title"],
@@ -119,7 +119,7 @@ def _get_auth_headers(cookiejar: CookieJar) -> str | None:
 
 
 async def _run_in_loop(func: Callable, kwargs: dict) -> Any:
-    """Runs a syncrhonous function asynchronously using the current event loop.
+    """Runs a synchronous function asynchronously using the current event loop.
 
     Args:
         func: Function to be called.

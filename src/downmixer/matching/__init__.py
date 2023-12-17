@@ -1,5 +1,5 @@
 """Classes and methods to easily compare the compatibility of a result with a song being matched. Uses fuzzy string
-compairson with the [RapidFuzz package](https://github.com/maxbachmann/RapidFuzz).
+comparison with the [RapidFuzz package](https://github.com/maxbachmann/RapidFuzz).
 
 Matching is done individually on song name, primary artist, other artists, album name, and length - artist matches are
 calculated down to a single score value (scores go from 0 to 100). Therefore, the sum can be a range of 0 to 400.
@@ -40,7 +40,7 @@ class MatchQuality(Enum):
 
 @dataclass
 class MatchResult:
-    """Holds match results and provides conveneint property methods to get/calculate quality and match score."""
+    """Holds match results and provides convenient property methods to get/calculate quality and match score."""
 
     method: str
     name_match: float
@@ -69,7 +69,7 @@ class MatchResult:
 
     @property
     def sum(self) -> float:
-        """Sums all matches (uses average artist match value). Maxixmum value is 400."""
+        """Sums all matches (uses average artist match value). Maximum value is 400."""
         return (
             self.name_match
             + self.artists_match_avg
@@ -84,7 +84,7 @@ class MatchResult:
             threshold (float): Tha value that will be compared to all the values.
 
         Returns:
-            True if every match score is higher than the hreshold, false otherwise.
+            True if every match score is higher than the threshold, false otherwise.
         """
         name_test = self.name_match >= threshold
         artists_test = self.artists_match_avg >= threshold
@@ -102,7 +102,7 @@ def match(original_song: Song, result_song: Song) -> MatchResult:
         result_song (Song): Song being compared. Should be slugified for better results.
 
     Returns:
-        MatchResult: Match scores of the compairson between original and result song.
+        MatchResult: Match scores of the comparison between original and result song.
     """
     song_slug = original_song.slug()
     result_slug = result_song.slug()
@@ -154,7 +154,7 @@ def _match_artist_list(
 
 def _match_length(len1: float, len2: float, ceiling: int = 120):
     """Plots the difference between `len1` and `len2` in a [graph](https://www.desmos.com/calculator/3guvoyxg4z) and
-    returns the y value of this graph. The `ceiling` parameter defines the scale of the x axis.
+    returns the y value of this graph. The `ceiling` parameter defines the scale of the x-axis.
     """
     x = downmixer.matching.utils.remap(abs(len1 - len2), 0, ceiling, 0, 1)
     y = downmixer.matching.utils.ease(x) * 100

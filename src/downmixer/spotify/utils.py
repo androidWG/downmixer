@@ -27,11 +27,11 @@ def check_valid(value: str, type_filter: list[ResourceType] = None) -> bool:
     """Checks using a regex if a string is a valid Spotify ID, URI or URL.
 
     Args:
-        value (str): Arbitrary sring that will be checked.
+        value (str): Arbitrary string that will be checked.
         type_filter (list[ResourceType]): Which resource types are accepted. Default any type.
 
     Returns:
-         bool: True if the string given trhough `value` is a valid Spotify ID, URI or URL **and** it matches **any**
+         bool: True if the string given through `value` is a valid Spotify ID, URI or URL **and** it matches **any**
          of the specified resource types. Otherwise, returns False.
     """
     if type_filter is None:

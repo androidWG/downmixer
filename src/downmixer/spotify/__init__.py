@@ -1,5 +1,5 @@
 """Wrapper/helper for the [spotipy](https://github.com/spotipy-dev/spotipy) package to make use of Downmixer's
-`library` paackage and facilitate calls with pagination."""
+`library` package and facilitate calls with pagination."""
 
 import logging
 
@@ -11,7 +11,7 @@ logger = logging.getLogger("downmixer").getChild(__name__)
 
 
 class Spotify:
-    """Holds info about the Spotify connection like scope, login/authorixation and a SpotifyClient instance."""
+    """Holds info about the Spotify connection like scope, login/authorization and a SpotifyClient instance."""
 
     def __init__(self):
         self._spotipy_client: SpotifyClient | None = None
@@ -20,4 +20,4 @@ class Spotify:
         scope = "user-library-read,playlist-read-private,playlist-read-collaborative"
         logger.debug("Creating SpotifyClient, asking user to log in...")
         self._spotipy_client = SpotifyClient(auth_manager=SpotifyOAuth(scope=scope))
-        logger.info("Creaeted SpotifyClient")
+        logger.info("Created SpotifyClient")

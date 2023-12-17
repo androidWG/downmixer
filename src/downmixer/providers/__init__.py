@@ -25,8 +25,8 @@ class AudioSearchResult:
 
     @property
     def song(self) -> Song:
-        """Compared the match quality with a set threshold and returns the most appripriate choice between the
-        original song from Spotufy or the result given by the provider.
+        """Compares the match quality with a set threshold and returns the most appropriate choice between the
+        original song from Spotify or the result given by the provider.
 
         Returns:
             song (Song): The appropriate song object.

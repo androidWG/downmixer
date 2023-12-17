@@ -33,7 +33,7 @@ class BasicProcessor:
             output_folder (str): Folder path where the final file will be placed.
             temp_folder (str): Folder path where temporary files will be placed and removed from when processing
                 is finished.
-            threads (int): Amount of threads that will simultaniously process songs.
+            threads (int): Amount of threads that will simultaneously process songs.
         """
         self.output_folder: Path = Path(output_folder).absolute()
         self.temp_folder = temp_folder
@@ -57,8 +57,8 @@ class BasicProcessor:
             logger.debug(f"Processing song '{song}'")
             await self.process_song(song)
 
-    async def process_playlist(self, palylist_id: str):
-        songs = self.spotify.all_playlist_songs(palylist_id)
+    async def process_playlist(self, playlist_id: str):
+        songs = self.spotify.all_playlist_songs(playlist_id)
 
         tasks = [self.pool_processing(s.uri) for s in songs]
         await asyncio.gather(*tasks)

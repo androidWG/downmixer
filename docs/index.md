@@ -1,7 +1,7 @@
 # Getting started
 
 ## Commands
-Downmixer is a library first. The `download` command specified below is purely for testing and conevience.
+Downmixer is a library first. The `download` command specified below is purely for testing and convenience.
 
 * `downmixer download [spotify-id]` - Download a Spotify song to the current directory.
 

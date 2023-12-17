@@ -37,7 +37,7 @@ class BaseLibraryItem:
             data (list[dict]): List with dictionaries with data from the Spotify API.
 
         Returns:
-            A list with isntances of this class.
+            A list with instances of this class.
         """
         return [cls.from_spotify(x) for x in data]
 

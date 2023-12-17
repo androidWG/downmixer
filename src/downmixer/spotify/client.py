@@ -51,7 +51,7 @@ class SpotifyClient:
         return Song.from_spotify_list(results["items"])
 
     def song(self, track_id: str) -> Song:
-        """Retireve a song (a.k.a. a "track") from the Spotify API. Returns a new Song object with the metadata from
+        """Retrieve a song (a.k.a. a "track") from the Spotify API. Returns a new Song object with the metadata from
         Spotify.
 
         Args:
@@ -60,11 +60,11 @@ class SpotifyClient:
                 for more info.
 
         Returns:
-            Song object with the metadata retireved from Spotify.
+            Song object with the metadata retrieved from Spotify.
         """
         if not check_valid(track_id, [ResourceType.TRACK]):
             raise ValueError(
-                f"{track_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
+                f"{track_id} is an invalid Spotify track ID. Make sure it matches either an URI, URL or ID. "
                 f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
             )
 
@@ -74,7 +74,7 @@ class SpotifyClient:
         return Song.from_spotify(result)
 
     def all_playlists(self) -> list[Playlist]:
-        """Retrives the all the user's playlists in a list. Requires the [`playlist-read-private` scope](
+        """Retrieves the all the user's playlists in a list. Requires the [`playlist-read-private` scope](
         https://developer.spotify.com/documentation/general/guides/authorization/scopes/#playlist-read-private) to
         read private playlists and the [`playlist-read-collaborative` scope](
         https://developer.spotify.com/documentation/general/guides/authorization/scopes/#playlist-read-collaborative) to
@@ -87,7 +87,7 @@ class SpotifyClient:
         return Playlist.from_spotify_list(results)
 
     def all_saved_tracks(self) -> list[Song]:
-        """Retrives the all the user's saved tracks in a list. Requires the [`user-library-read` scope]
+        """Retrieves the all the user's saved tracks in a list. Requires the [`user-library-read` scope]
         (https://developer.spotify.com/documentation/general/guides/authorization/scopes/#user-library-read).
 
         Returns:
@@ -97,7 +97,7 @@ class SpotifyClient:
         return Song.from_spotify_list(results)
 
     def all_playlist_songs(self, playlist_id: str) -> list[Song]:
-        """Retrives the all the songs from a playlist in a list. Requires the [`playlist-read-private` scope](
+        """Retrieves the all the songs from a playlist in a list. Requires the [`playlist-read-private` scope](
         https://developer.spotify.com/documentation/general/guides/authorization/scopes/#playlist-read-private) to
         read private playlists and the [`playlist-read-collaborative` scope](
         https://developer.spotify.com/documentation/general/guides/authorization/scopes/#playlist-read-collaborative) to
@@ -113,7 +113,7 @@ class SpotifyClient:
         """
         if not check_valid(playlist_id, [ResourceType.PLAYLIST]):
             raise ValueError(
-                f"{playlist_id} is an invalid Spotify track ID. Make sure it mactches either an URI, URL or ID. "
+                f"{playlist_id} is an invalid Spotify track ID. Make sure it matches either an URI, URL or ID. "
                 f"More information: https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids"
             )
 
