@@ -17,9 +17,9 @@ downmixer download [spotify id]
 Downloads the first matched result for a Spotify song ID.
 
 ### Use as a library
-Downmixer is made to be adapted to your workflow. By default it doesn't provide a large convenience function like spotDL's `search()` and `download()` methods.
+Downmixer is made to be used as a library by other apps. By default, it doesn't provide a large convenience function like spotDL's `search()` and `download()` methods.
 
-Documentation coming soon.
+More info in the documentation: https://androidwg.github.io/downmixer/
 
 ## Building
 
