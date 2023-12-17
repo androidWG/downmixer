@@ -9,6 +9,13 @@ plugins:
     handlers:
       python:
         paths: [src]
+        options:
+          show_submodules: true
+          show_source: false
+- gen-files:
+      scripts:
+        - gen_pages.py
+- awesome-pages
 
 theme:
   name: material
@@ -18,13 +25,16 @@ theme:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: green
+      accent: green
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      accent: lime
+      primary: green
+      accent: light green
       toggle:
         icon: material/brightness-4
         name: Switch to light mode

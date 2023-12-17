@@ -20,6 +20,8 @@ black = "*"
 build = "*"
 mkdocs-material = "*"
 mkdocstrings = {extras = ["python"], version = "*"}
+mkdocs-gen-files = "*"
+mkdocs-awesome-pages-plugin = "*"
 
 [requires]
 python_version = "3.12"
