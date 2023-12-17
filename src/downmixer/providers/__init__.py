@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Optional
+from typing import Optional, List, Type
 
 from downmixer.file_tools import AudioCodecs
 from downmixer.library import Song, Playlist
@@ -176,12 +176,25 @@ class BaseInfoProvider:
         pass
 
 
-def _get_all_providers(subfolder: str) -> list[ModuleType]:
-    # TODO: Add support for importing third-party providers
-
-    providers_path = Path(__file__).parent.joinpath(subfolder)
+# TODO: Add support for importing third-party providers
+def _import_submodules(prefix: str):
+    providers_path = Path(__file__).parent.joinpath(prefix)
     current_package_name = sys.modules[__name__].__name__
-    return [
-        importlib.import_module(f"{current_package_name}.{subfolder}.{name}")
-        for loader, name, is_pkg in pkgutil.walk_packages([providers_path])
-    ]
+
+    for loader, name, is_pkg in pkgutil.walk_packages([providers_path]):
+        importlib.import_module(f"{current_package_name}.{prefix}.{name}")
+
+
+def get_all_audio_providers() -> list[Type[BaseAudioProvider]]:
+    _import_submodules("audio")
+    return BaseAudioProvider.__subclasses__()
+
+
+def get_all_lyrics_providers() -> list[Type[BaseLyricsProvider]]:
+    _import_submodules("lyrics")
+    return BaseLyricsProvider.__subclasses__()
+
+
+def get_all_info_providers() -> list[Type[BaseInfoProvider]]:
+    _import_submodules("info")
+    return BaseInfoProvider.__subclasses__()
