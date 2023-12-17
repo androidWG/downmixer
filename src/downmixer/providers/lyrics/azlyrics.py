@@ -111,3 +111,7 @@ class AZLyricsProvider(BaseLyricsProvider):
         ordered_results = sorted(results, reverse=True, key=lambda x: x.match.sum)
 
         return ordered_results
+
+
+def instance():
+    return AZLyricsProvider

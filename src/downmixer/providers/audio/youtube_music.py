@@ -214,3 +214,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
             bitrate=downloaded["abr"],
             audio_codec=AudioCodecs(downloaded["acodec"]),
         )
+
+
+def instance():
+    return YouTubeMusicAudioProvider
