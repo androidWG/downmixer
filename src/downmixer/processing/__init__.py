@@ -1,3 +1,5 @@
+"""Takes a playlist or song and processes it using audio and lyric providers."""
+
 import asyncio
 import logging
 import shutil
@@ -58,13 +60,17 @@ class BasicProcessor:
             await self.process_song(song)
 
     async def process_playlist(self, playlist_id: str):
+        """Makes a queue of tasks to download all songs in a Spotify playlist.
+
+        Args:
+            playlist_id (str): V"""
         songs = self.spotify.all_playlist_songs(playlist_id)
 
         tasks = [self.pool_processing(s.uri) for s in songs]
         await asyncio.gather(*tasks)
 
     async def process_song(self, song_id: str):
-        """Searches the song ISRC on YouTube
+        """Searches and downloads a song based on Spotify data.
 
         Args:
             song_id (str): Valid ID, URI or URL of a Spotify track.
