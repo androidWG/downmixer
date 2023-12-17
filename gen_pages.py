@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import mkdocs_gen_files
-import regex
 
 src_root = Path("src/downmixer")
 
@@ -28,13 +27,26 @@ for path in src_root.glob("*"):
     _iterate_subdirectories(path)
 
 for path in src_root.glob("**/*.py"):
-    if regex.search(r"__.*__.py", path.name) is not None:
+    relative_path = path.relative_to(src_root)
+
+    is_init = relative_path.name.startswith("__")
+    is_root_init = is_init and len(relative_path.parts) <= 1
+    if relative_path.name == "__pycache__" or is_root_init:
         continue
 
-    relative_path = path.relative_to(src_root)
-    doc_path = Path("reference", relative_path).with_suffix(".md")
+    if is_init:
+        doc_path = Path("reference", relative_path.parent, "index.md")
+    else:
+        doc_path = Path("reference", relative_path).with_suffix(".md")
 
     with mkdocs_gen_files.open(doc_path, "w") as f:
-        ident = ".".join(path.with_suffix("").parts[1:])
-        print(f"# `{path.stem}`", file=f)
-        print("::: " + ident, file=f)
+        if is_init:
+            ident = path.with_suffix("").parent.parts[1:]
+        else:
+            ident = path.with_suffix("").parts[1:]
+
+        print(f"# `{ident[-1]}`", file=f)
+        print("::: " + ".".join(ident), file=f)
+        if is_init:
+            print("\toptions:", file=f)
+            print("\t\tshow_submodules: false", file=f)

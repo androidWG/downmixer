@@ -4,7 +4,7 @@ Downmixer's purpose is not to be an end-user command line tool like spotDL, yout
 
 That being said, Downmixer *does* provide a simple command line interface for convenience, testing and simple usage.
 
-It uses the default [`BasicProcessor`](/references/#downmixer.processing.BasicProcessor) class to search, download and convert a Spotify track, playlist or album.
+It uses the default [`BasicProcessor`](/reference/processing/#downmixer.processing.BasicProcessor) class to search, download and convert a Spotify track, playlist or album.
 
 ## Usage
 
