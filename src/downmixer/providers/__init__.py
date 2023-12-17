@@ -9,7 +9,7 @@ from types import ModuleType
 from typing import Optional
 
 from downmixer.file_tools import AudioCodecs
-from downmixer.library import Song
+from downmixer.library import Song, Playlist
 from downmixer.matching import MatchResult, MatchQuality
 
 
@@ -159,9 +159,29 @@ class BaseLyricsProvider:
         raise NotImplementedError
 
 
-def get_all_audio_providers() -> list[ModuleType]:
-    package = sys.modules[__name__]
+class BaseInfoProvider:
+    """Base class for all song info providers. Defines the interface that any song info provider in Downmixer should
+    use."""
+
+    def get_song(self, track_id: str) -> Song:
+        pass
+
+    def get_all_playlist_songs(self, playlist_id: str) -> list[Song]:
+        pass
+
+    def get_all_playlists(self) -> list[Playlist]:
+        pass
+
+    def get_all_saved_tracks(self) -> list[Song]:
+        pass
+
+
+def _get_all_providers(subfolder: str) -> list[ModuleType]:
+    # TODO: Add support for importing third-party providers
+
+    providers_path = Path(__file__).parent.joinpath(subfolder)
+    current_package_name = sys.modules[__name__].__name__
     return [
-        importlib.import_module(__name__ + "." + name)
-        for loader, name, is_pkg in pkgutil.walk_packages(package.__path__)
+        importlib.import_module(f"{current_package_name}.{subfolder}.{name}")
+        for loader, name, is_pkg in pkgutil.walk_packages([providers_path])
     ]
