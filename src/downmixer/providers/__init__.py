@@ -161,18 +161,57 @@ class BaseLyricsProvider:
 
 class BaseInfoProvider:
     """Base class for all song info providers. Defines the interface that any song info provider in Downmixer should
-    use."""
+    use.
+
+    Info providers are streaming platforms where a user has a library of songs, a.k.a. Spotify, YouTube Music,
+    Deezer, Apple Music, etc. Used to get the user's library and read the data of that song on said platform.
+    """
+
+    connected = False
+
+    def check_valid_url(self, url: str) -> bool:
+        pass
+
+    def connect(self):
+        """"""
+        pass
 
     def get_song(self, track_id: str) -> Song:
+        """Retrieve a song from the info provider. Returns a new Song object with the metadata from
+        the provider.
+
+        Args:
+            track_id (str): A string containing a valid ID for the provider.
+
+        Returns:
+            Song object with the metadata retrieved from he provider.
+        """
         pass
 
     def get_all_playlist_songs(self, playlist_id: str) -> list[Song]:
+        """Retrieves the all the songs from a playlist as a list.
+        Args:
+            playlist_id (str): A string containing a valid ID for the provider.
+
+        Returns:
+            User's playlists as a list of Playlist objects.
+        """
         pass
 
     def get_all_playlists(self) -> list[Playlist]:
+        """Retrieves the all the user's playlists in a list.
+
+        Returns:
+            User's playlists as a list of Playlist objects.
+        """
         pass
 
     def get_all_saved_tracks(self) -> list[Song]:
+        """Retrieves the all the user's saved tracks in a list.
+
+        Returns:
+            User's playlists as a list of Playlist objects.
+        """
         pass
 
 
