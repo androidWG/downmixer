@@ -186,15 +186,21 @@ def _import_submodules(prefix: str):
 
 
 def get_all_audio_providers() -> list[Type[BaseAudioProvider]]:
+    """Imports providers from internal submodules folder and returns a list containing all subclasses of
+    BaseAudioProvider."""
     _import_submodules("audio")
     return BaseAudioProvider.__subclasses__()
 
 
 def get_all_lyrics_providers() -> list[Type[BaseLyricsProvider]]:
+    """Imports providers from internal submodules folder and returns a list containing all subclasses of
+    BaseLyricsProvider."""
     _import_submodules("lyrics")
     return BaseLyricsProvider.__subclasses__()
 
 
 def get_all_info_providers() -> list[Type[BaseInfoProvider]]:
+    """Imports providers from internal submodules folder and returns a list containing all subclasses of
+    BaseInfoProvider."""
     _import_submodules("info")
     return BaseInfoProvider.__subclasses__()
