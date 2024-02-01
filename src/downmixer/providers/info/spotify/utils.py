@@ -1,13 +1,6 @@
 import re
-from enum import Enum
 
-
-class ResourceType(Enum):
-    TRACK = 1
-    ALBUM = 2
-    ARTIST = 3
-    PLAYLIST = 4
-    USER = 5
+from downmixer.providers import ResourceType
 
 
 def get_resource_type(value: str) -> ResourceType | None:

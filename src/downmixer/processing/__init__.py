@@ -7,10 +7,15 @@ from pathlib import Path
 
 from downmixer.file_tools import tag, utils
 from downmixer.file_tools.convert import Converter
-from downmixer.providers import Download
+from downmixer.providers import (
+    Download,
+    get_all_info_providers,
+    BaseInfoProvider,
+    BaseAudioProvider,
+    BaseLyricsProvider,
+)
 from downmixer.providers.audio.youtube_music import YouTubeMusicAudioProvider
 from downmixer.providers.lyrics.azlyrics import AZLyricsProvider
-from downmixer.spotify import SpotifyClient
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -23,10 +28,12 @@ async def _convert_download(download: Download) -> Download:
 class BasicProcessor:
     def __init__(
         self,
-        output_folder: str,
-        temp_folder: str,
+        info_provider: BaseInfoProvider,
+        audio_provider: BaseAudioProvider,
+        lyrics_provider: BaseLyricsProvider,
+        output_folder: Path,
+        temp_folder: Path,
         threads: int = 12,
-        cookies: str = None,
     ):
         """Basic processing class to search a specific Spotify song and download it, using the default YT Music and
         AZLyrics providers.
@@ -40,17 +47,16 @@ class BasicProcessor:
         self.output_folder: Path = Path(output_folder).absolute()
         self.temp_folder = temp_folder
 
-        scope = "user-library-read,playlist-read-private"
-        self.spotify = SpotifyClient(scope)
-        self.ytmusic = YouTubeMusicAudioProvider(cookies)
-        self.azlyrics = AZLyricsProvider()
+        self.info_provider = info_provider
+        self.audio_provider = audio_provider
+        self.lyrics_provider = lyrics_provider
 
         self.semaphore = asyncio.Semaphore(threads)
 
     async def _get_lyrics(self, download: Download):
-        lyrics_results = await self.azlyrics.search(download.song)
+        lyrics_results = await self.lyrics_provider.search(download.song)
         if lyrics_results is not None:
-            lyrics = await self.azlyrics.get_lyrics(lyrics_results[0].url)
+            lyrics = await self.lyrics_provider.get_lyrics(lyrics_results[0])
             download.song.lyrics = lyrics
 
     async def pool_processing(self, song: str):
@@ -64,7 +70,7 @@ class BasicProcessor:
 
         Args:
             playlist_id (str): V"""
-        songs = self.spotify.all_playlist_songs(playlist_id)
+        songs = self.info_provider.get_all_playlist_songs(playlist_id)
 
         tasks = [self.pool_processing(s.uri) for s in songs]
         await asyncio.gather(*tasks)
@@ -75,13 +81,13 @@ class BasicProcessor:
         Args:
             song_id (str): Valid ID, URI or URL of a Spotify track.
         """
-        song = self.spotify.song(song_id)
+        song = self.info_provider.get_song(song_id)
 
-        result = await self.ytmusic.search(song)
+        result = await self.audio_provider.search(song)
         if result is None:
             logger.warning("Song not found", extra={"songinfo": song.__dict__})
             return
-        downloaded = await self.ytmusic.download(result[0], self.temp_folder)
+        downloaded = await self.audio_provider.download(result[0], self.temp_folder)
         converted = await _convert_download(downloaded)
 
         await self._get_lyrics(converted)

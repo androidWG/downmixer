@@ -4,13 +4,21 @@ import importlib
 import pkgutil
 import sys
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from types import ModuleType
-from typing import Optional, List, Type
+from typing import Optional, Type
 
 from downmixer.file_tools import AudioCodecs
 from downmixer.library import Song, Playlist
 from downmixer.matching import MatchResult, MatchQuality
+
+
+class ResourceType(Enum):
+    SONG = 1
+    ALBUM = 2
+    ARTIST = 3
+    PLAYLIST = 4
+    USER = 5
 
 
 @dataclass
@@ -159,6 +167,11 @@ class BaseLyricsProvider:
         raise NotImplementedError
 
 
+class NotConnectedException(Exception):
+    pass
+
+
+# noinspection PyTypeChecker
 class BaseInfoProvider:
     """Base class for all song info providers. Defines the interface that any song info provider in Downmixer should
     use.
@@ -169,7 +182,10 @@ class BaseInfoProvider:
 
     connected = False
 
-    def check_valid_url(self, url: str) -> bool:
+    def __init__(self, **kwargs):
+        pass
+
+    def check_valid_url(self, url: str, type_filter: list[ResourceType] = None) -> bool:
         pass
 
     def connect(self):
@@ -186,6 +202,14 @@ class BaseInfoProvider:
         Returns:
             Song object with the metadata retrieved from he provider.
         """
+        if not self.connected:
+            raise NotConnectedException(
+                "Not connected to platform, cannot retrieve data"
+            )
+
+        if not self.check_valid_url(track_id, [ResourceType.SONG]):
+            raise ValueError(f"{track_id} is an invalid song URL or ID")
+
         pass
 
     def get_all_playlist_songs(self, playlist_id: str) -> list[Song]:
@@ -196,6 +220,14 @@ class BaseInfoProvider:
         Returns:
             User's playlists as a list of Playlist objects.
         """
+        if not self.connected:
+            raise NotConnectedException(
+                "Not connected to platform, cannot retrieve data"
+            )
+
+        if not self.check_valid_url(playlist_id, [ResourceType.PLAYLIST]):
+            raise ValueError(f"{playlist_id} is an invalid playlist URL or ID")
+
         pass
 
     def get_all_playlists(self) -> list[Playlist]:
@@ -204,6 +236,10 @@ class BaseInfoProvider:
         Returns:
             User's playlists as a list of Playlist objects.
         """
+        if not self.connected:
+            raise NotConnectedException(
+                "Not connected to platform, cannot retrieve data"
+            )
         pass
 
     def get_all_saved_tracks(self) -> list[Song]:
@@ -212,6 +248,10 @@ class BaseInfoProvider:
         Returns:
             User's playlists as a list of Playlist objects.
         """
+        if not self.connected:
+            raise NotConnectedException(
+                "Not connected to platform, cannot retrieve data"
+            )
         pass
 
 
