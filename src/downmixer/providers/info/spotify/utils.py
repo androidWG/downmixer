@@ -2,6 +2,13 @@ import re
 
 from downmixer.providers import ResourceType
 
+resource_type_map = {
+    ResourceType.SONG: "track",
+    ResourceType.ALBUM: "album",
+    ResourceType.PLAYLIST: "playlist",
+    ResourceType.ARTIST: "artist",
+}
+
 
 def get_resource_type(value: str) -> ResourceType | None:
     if not check_valid(value):
@@ -13,7 +20,9 @@ def get_resource_type(value: str) -> ResourceType | None:
     if matches is None:
         return None
     else:
-        return ResourceType[matches.group(1).upper()]
+        return list(resource_type_map.keys())[
+            list(resource_type_map.values()).index(matches.group(1).lower())
+        ]
 
 
 def check_valid(value: str, type_filter: list[ResourceType] = None) -> bool:
@@ -31,7 +40,7 @@ def check_valid(value: str, type_filter: list[ResourceType] = None) -> bool:
         type_filter = [e for e in ResourceType]
 
     for t in type_filter:
-        regex = r"spotify.*" + t.name.lower() + r"(?::|\/)(\w{20,24})"
+        regex = r"spotify.*" + resource_type_map[t] + r"(?::|\/)(\w{20,24})"
         if re.search(regex, value) is not None:
             return True
 
