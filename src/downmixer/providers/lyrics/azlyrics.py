@@ -69,8 +69,8 @@ class AZLyricsProvider(BaseLyricsProvider):
 
         self.x_code = js_code[start_index : start_index + end_index]
 
-    async def get_lyrics(self, url: str) -> Optional[str]:
-        response = self.session.get(url)
+    async def get_lyrics(self, search_result: LyricsSearchResult) -> Optional[str]:
+        response = self.session.get(search_result.url)
         soup = BeautifulSoup(response.content, "html.parser")
 
         div_tags = soup.find_all("div", class_=False, id_=False)
