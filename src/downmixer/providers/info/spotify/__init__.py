@@ -24,10 +24,16 @@ def _get_all(func, limit=50, *args, **kwargs):
 
 
 class SpotifyInfoProvider(BaseInfoProvider):
-    def __init__(self, scope: str):
+    def __init__(self):
         super().__init__()
         # TODO: Manage auth properly
-        self.client = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scope))
+        self.client = spotipy.Spotify(
+            auth_manager=spotipy.SpotifyOAuth(
+                scope="user-library-read,user-read-private"
+            )
+        )
+
+        self.connected = True
 
     def check_valid_url(self, url: str, type_filter: list[ResourceType] = None) -> bool:
         return utils.check_valid(url, type_filter)
