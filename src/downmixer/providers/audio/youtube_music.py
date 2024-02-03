@@ -188,7 +188,7 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         return ordered_results
 
     async def download(
-        self, result: AudioSearchResult, path: str = ""
+        self, result: AudioSearchResult, path: Path = ""
     ) -> Optional[Download]:
         logger.info(
             f"Starting download for search result '{result.song.title}' with URL {result.download_url}"
@@ -198,7 +198,9 @@ class YouTubeMusicAudioProvider(BaseAudioProvider):
         # TODO: make file download to temp folder
         if path != "":
             # Define output path of YoutubeDL on the fly
-            self.youtube_dl.params["outtmpl"]["default"] = path + "/%(id)s.%(ext)s"
+            self.youtube_dl.params["outtmpl"]["default"] = (
+                str(path.absolute()) + "/%(id)s.%(ext)s"
+            )
         url = result.download_url
         metadata = await _run_in_loop(
             self.youtube_dl.extract_info, {"url": url, "download": True}
