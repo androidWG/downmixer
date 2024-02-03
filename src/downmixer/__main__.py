@@ -1,11 +1,16 @@
 import argparse
 import asyncio
+import importlib
 import logging
 import os
 import tempfile
 from downmixer import processing, log
-from downmixer.spotify.utils import ResourceType, check_valid, get_resource_type
+from downmixer import providers
 from pathlib import Path
+
+from downmixer.providers import ResourceType
+from downmixer.providers.info.spotify import check_valid
+from downmixer.providers.info.spotify.utils import get_resource_type
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -33,6 +38,30 @@ parser.add_argument(
     dest="cookies",
     help="Path to a Netscape-formatted text file containing cookies to be used in the requests to YouTube.",
 )
+parser.add_argument(
+    "-ip",
+    "--info-provider",
+    type=str,
+    default="SpotifyInfoProvider",
+    choices=[x.__name__ for x in providers.get_all_info_providers()],
+    help=f"Info provider extending BaseInfoProvider to use. Defaults to 'SpotifyInfoProvider'.",
+)
+parser.add_argument(
+    "-ap",
+    "--audio-provider",
+    type=str,
+    default="YouTubeMusicAudioProvider",
+    choices=[x.__name__ for x in providers.get_all_audio_providers()],
+    help=f"Audio provider extending BaseAudioProvider to use. Defaults to 'YouTubeMusicAudioProvider'.",
+)
+parser.add_argument(
+    "-lp",
+    "--lyrics-provider",
+    type=str,
+    default="AZLyricsProvider",
+    choices=[x.__name__ for x in providers.get_all_lyrics_providers()],
+    help=f"Lyrics provider extending BaseLyricsProvider to use. Defaults to 'AZLyricsProvider'.",
+)
 args = parser.parse_args()
 
 
@@ -44,7 +73,7 @@ def command_line():
 
         if not check_valid(
             args.id,
-            [ResourceType.TRACK, ResourceType.PLAYLIST, ResourceType.ALBUM],
+            [ResourceType.SONG, ResourceType.PLAYLIST, ResourceType.ALBUM],
         ):
             raise ValueError("id provided isn't valid")
 
@@ -53,9 +82,25 @@ def command_line():
             rtype = get_resource_type(args.id)
 
             processor = processing.BasicProcessor(
-                args.output, temp, cookies=os.path.abspath(args.cookies)
+                [
+                    x
+                    for x in providers.get_all_info_providers()
+                    if x.__name__ == args.info_provider
+                ][0](),
+                [
+                    x
+                    for x in providers.get_all_audio_providers()
+                    if x.__name__ == args.audio_provider
+                ][0](),
+                [
+                    x
+                    for x in providers.get_all_lyrics_providers()
+                    if x.__name__ == args.lyrics_provider
+                ][0](),
+                args.output,
+                Path(temp),
             )
-            if rtype == ResourceType.TRACK:
+            if rtype == ResourceType.SONG:
                 logger.debug("Downloading one track")
                 asyncio.run(processor.process_song(args.id))
             else:
