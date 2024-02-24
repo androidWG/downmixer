@@ -348,5 +348,3 @@ poetry.toml
 
 cookies*
 /output/
-
-Pipfile.lock
