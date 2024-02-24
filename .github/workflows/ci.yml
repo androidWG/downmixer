@@ -17,7 +17,7 @@ jobs:
           python-version: 3.x
           cache: 'pipenv'
       - name: Install pipenv
-        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+        run: pip install pipenv
       - run: pipenv install --dev
       - uses: actions/cache@v2
         with:
