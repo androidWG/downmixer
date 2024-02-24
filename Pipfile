@@ -19,6 +19,7 @@ beautifulsoup4 = "*"
 black = "*"
 build = "*"
 mkdocs-material = "*"
+mkdocs = "*"
 mkdocstrings = {extras = ["python"], version = "*"}
 mkdocs-gen-files = "*"
 mkdocs-awesome-pages-plugin = "*"
