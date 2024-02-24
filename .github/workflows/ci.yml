@@ -19,5 +19,5 @@ jobs:
         with:
           key: ${{ github.ref }}
           path: .cache
-      - run: pip install mkdocs-material mkdocstrings[python] mkdocs-gen-files
+      - run: pipenv install --dev
       - run: mkdocs gh-deploy --force
