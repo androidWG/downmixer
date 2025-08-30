@@ -6,8 +6,9 @@ import re
 import spotipy
 
 from downmixer import utils
+from downmixer.library import Playlist
 from downmixer.providers import BaseInfoProvider, ResourceType
-from .library import SpotifySong, SpotifyPlaylist
+from .library import SpotifySong, SpotifyPlaylist, SpotifyAlbum
 
 logger = logging.getLogger("downmixer").getChild(__name__)
 
@@ -101,6 +102,12 @@ class SpotifyInfoProvider(BaseInfoProvider):
 
         results = _get_all(self.client.current_user_playlists)
         return SpotifyPlaylist.from_provider_list(results)
+
+    def get_all_user_albums(self) -> list[Playlist]:
+        super().get_all_user_albums()
+
+        results = _get_all(self.client.current_user_saved_albums, limit=50)
+        return SpotifyAlbum.from_provider_list(results)
 
     def get_all_user_songs(self) -> list[SpotifySong]:
         super().get_all_user_songs()

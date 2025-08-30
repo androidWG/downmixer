@@ -34,6 +34,13 @@ class SpotifyAlbum(Album):
             url=data["external_urls"]["spotify"],
         )
 
+    @classmethod
+    def from_provider_list(
+        cls, data: list[Any], extra_data: dict = None
+    ) -> list["SpotifyAlbum"]:
+        """Takes in a list of albums from the Spotify API and returns a list of SpotifyAlbums."""
+        return [cls.from_provider(x["album"], extra_data) for x in data]
+
 
 class SpotifySong(Song):
     @classmethod
