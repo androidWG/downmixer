@@ -38,9 +38,10 @@ If you want to use Downmixer in your project, refer to the documentation here: h
 
 ## Building
 
+Uses [uv](https://docs.astral.sh/uv/) package manager. To build from source, run:
+
 ```shell
 git clone https://github.com/neufter/downmixer
 cd downmixer
-pipenv install
-pip install build
+uv build
 ```
